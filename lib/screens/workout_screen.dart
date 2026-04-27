@@ -38,8 +38,6 @@ class _WorkoutScreenState extends State<WorkoutScreen>
   bool _isUsingTemplate = false;
 
   // 动画控制器
-  late AnimationController _timerFadeController;
-  late Animation<double> _timerFadeAnimation;
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
   late AnimationController _glowController;
@@ -49,19 +47,6 @@ class _WorkoutScreenState extends State<WorkoutScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
-    // 初始化计时器淡入动画
-    _timerFadeController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-    _timerFadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _timerFadeController,
-      curve: Curves.easeOut,
-    ));
 
     // 初始化脉冲动画
     _pulseController = AnimationController(
@@ -143,7 +128,6 @@ class _WorkoutScreenState extends State<WorkoutScreen>
   void dispose() {
     _timer?.cancel();
     _saveTimer?.cancel();
-    _timerFadeController.dispose();
     _pulseController.dispose();
     _glowController.dispose();
     WidgetsBinding.instance.removeObserver(this);
@@ -213,7 +197,6 @@ class _WorkoutScreenState extends State<WorkoutScreen>
 
         // 停止脉冲动画，启动计时器动画
         _pulseController.stop();
-        _timerFadeController.forward();
         _glowController.repeat(reverse: true);
 
         // 显示恢复提示
@@ -635,9 +618,6 @@ class _WorkoutScreenState extends State<WorkoutScreen>
       _isTimerRunning = true;
       _startTime = DateTime.now();
     });
-
-    // 启动计时器淡入动画
-    _timerFadeController.forward();
 
     // 启动发光呼吸动画
     _glowController.repeat(reverse: true);
