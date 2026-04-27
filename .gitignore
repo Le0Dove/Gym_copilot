@@ -55,5 +55,12 @@ GeneratedPluginRegistrant.*
 .env.*
 .env.local
 
+# APK and AAB files
+*.apk
+*.aab
+
+# Screenshots (if not needed in repo)
+/screenshots/
+
 # Private excluded files (do not upload to GitHub)
 /.private_excluded/

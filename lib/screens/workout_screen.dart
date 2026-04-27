@@ -419,10 +419,44 @@ class _WorkoutScreenState extends State<WorkoutScreen>
   // 紧凑的计时器显示
   Widget _buildCompactTimer(int minutes, int seconds, ThemeData theme) {
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 300),
+      reverseDuration: const Duration(milliseconds: 200),
+      transitionBuilder: (child, animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.85, end: 1.0).animate(
+              CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutCubic,
+              ),
+            ),
+            child: child,
+          ),
+        );
+      },
+      layoutBuilder: (currentChild, previousChildren) {
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            ...previousChildren,
+            if (currentChild != null) currentChild,
+          ],
+        );
+      },
       child: !_isTimerRunning
-          ? _buildStartButton(theme)
-          : _buildTimerDisplay(minutes, seconds, theme),
+          ? Container(
+              key: const ValueKey('startButton'),
+              height: MediaQuery.of(context).size.height * 0.45,
+              alignment: Alignment.center,
+              child: _buildStartButton(theme),
+            )
+          : Container(
+              key: const ValueKey('timerDisplay'),
+              height: MediaQuery.of(context).size.height * 0.45,
+              alignment: Alignment.center,
+              child: _buildTimerDisplay(minutes, seconds, theme),
+            ),
     );
   }
 
@@ -434,27 +468,15 @@ class _WorkoutScreenState extends State<WorkoutScreen>
           return Stack(
             alignment: Alignment.center,
             children: [
-              // 外层脉冲光环
+              // 柔和呼吸光环
               Transform.scale(
-                scale: _pulseAnimation.value * 1.15,
+                scale: _pulseAnimation.value * 1.2,
                 child: Container(
-                  width: 180,
-                  height: 56,
+                  width: 148,
+                  height: 148,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.1 * (1 - _pulseAnimation.value + 1.0)),
-                    borderRadius: BorderRadius.circular(28),
-                  ),
-                ),
-              ),
-              // 中层脉冲光环
-              Transform.scale(
-                scale: _pulseAnimation.value * 1.08,
-                child: Container(
-                  width: 180,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(28),
+                    shape: BoxShape.circle,
+                    color: theme.colorScheme.primary.withOpacity(0.06),
                   ),
                 ),
               ),
@@ -462,145 +484,149 @@ class _WorkoutScreenState extends State<WorkoutScreen>
             ],
           );
         },
-        child: ElevatedButton.icon(
-          key: const ValueKey('startButton'),
-          onPressed: _startTimer,
-          icon: const Icon(
-            Icons.play_arrow_rounded,
-            size: 28,
-            color: Colors.white,
-          ),
-          label: const Text(
-            '开始计时',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-              letterSpacing: 1,
+            child: GestureDetector(
+              onTap: _startTimer,
+              child: Container(
+                width: 132,
+                height: 132,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: theme.colorScheme.surface,
+                  border: Border.all(
+                    color: theme.colorScheme.primary.withOpacity(0.4),
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.colorScheme.primary.withOpacity(0.15),
+                      blurRadius: 30,
+                      spreadRadius: 6,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.play_arrow_rounded,
+                      size: 42,
+                      color: theme.colorScheme.primary,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '开始',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: theme.colorScheme.primary,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 40,
-              vertical: 14,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(28),
-            ),
-            elevation: 8,
-            shadowColor: theme.colorScheme.primary.withOpacity(0.5),
-          ),
-        ),
       ),
     );
   }
 
   Widget _buildTimerDisplay(int minutes, int seconds, ThemeData theme) {
-    return FadeTransition(
-      opacity: _timerFadeAnimation,
-      child: Container(
-        key: const ValueKey('timerDisplay'),
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // 计时器数字
+        Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // 计时器数字
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 分钟
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, animation) {
-                    return SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0, -0.5),
-                        end: Offset.zero,
-                      ).animate(animation),
-                      child: FadeTransition(
-                        opacity: animation,
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: Text(
-                    minutes.toString().padLeft(2, '0'),
-                    key: ValueKey<int>(minutes),
-                    style: theme.textTheme.displayLarge?.copyWith(
-                      fontSize: 48,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 2,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                ),
-                Text(
-                  ':',
-                  style: theme.textTheme.displayLarge?.copyWith(
-                    fontSize: 36,
-                    fontWeight: FontWeight.w300,
-                    color: theme.colorScheme.primary.withOpacity(0.5),
-                  ),
-                ),
-                // 秒数
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, animation) {
-                    return SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0, 0.5),
-                        end: Offset.zero,
-                      ).animate(animation),
-                      child: FadeTransition(
-                        opacity: animation,
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: Text(
-                    seconds.toString().padLeft(2, '0'),
-                    key: ValueKey<int>(seconds),
-                    style: theme.textTheme.displayLarge?.copyWith(
-                      fontSize: 48,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 2,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(width: 12),
-            // 状态指示器
-            AnimatedBuilder(
-              animation: _glowController,
-              builder: (context, child) {
-                return Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(
-                      0.5 + 0.5 * _glowAnimation.value,
-                    ),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: theme.colorScheme.primary.withOpacity(
-                          0.5 * _glowAnimation.value,
-                        ),
-                        blurRadius: 8,
-                        spreadRadius: 1,
-                      ),
-                    ],
+            // 分钟
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) {
+                return SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0, -0.5),
+                    end: Offset.zero,
+                  ).animate(animation),
+                  child: FadeTransition(
+                    opacity: animation,
+                    child: child,
                   ),
                 );
               },
+              child: Text(
+                minutes.toString().padLeft(2, '0'),
+                key: ValueKey<int>(minutes),
+                style: theme.textTheme.displayLarge?.copyWith(
+                  fontSize: 48,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 2,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ),
+            Text(
+              ':',
+              style: theme.textTheme.displayLarge?.copyWith(
+                fontSize: 36,
+                fontWeight: FontWeight.w300,
+                color: theme.colorScheme.primary.withOpacity(0.5),
+              ),
+            ),
+            // 秒数
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) {
+                return SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0, 0.5),
+                    end: Offset.zero,
+                  ).animate(animation),
+                  child: FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  ),
+                );
+              },
+              child: Text(
+                seconds.toString().padLeft(2, '0'),
+                key: ValueKey<int>(seconds),
+                style: theme.textTheme.displayLarge?.copyWith(
+                  fontSize: 48,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 2,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
             ),
           ],
         ),
-      ),
+        const SizedBox(width: 12),
+        // 状态指示器
+        AnimatedBuilder(
+          animation: _glowController,
+          builder: (context, child) {
+            return Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withOpacity(
+                  0.5 + 0.5 * _glowAnimation.value,
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.colorScheme.primary.withOpacity(
+                      0.5 * _glowAnimation.value,
+                    ),
+                    blurRadius: 8,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 
