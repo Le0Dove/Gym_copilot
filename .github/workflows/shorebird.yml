@@ -1,0 +1,51 @@
+name: Shorebird
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: 'Command'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - release
+          - patch
+      platform:
+        description: 'Platform'
+        required: true
+        default: 'android'
+        type: choice
+        options:
+          - android
+          - ios
+      artifact:
+        description: 'Artifact type (release only)'
+        required: false
+        default: 'apk'
+        type: choice
+        options:
+          - apk
+          - aab
+
+jobs:
+  shorebird:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Shorebird
+        uses: shorebirdtech/setup-shorebird@v1
+
+      - name: Shorebird Release
+        if: ${{ inputs.command == 'release' }}
+        run: shorebird release ${{ inputs.platform }} --artifact ${{ inputs.artifact }}
+        env:
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+
+      - name: Shorebird Patch
+        if: ${{ inputs.command == 'patch' }}
+        run: shorebird patch ${{ inputs.platform }}
+        env:
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
