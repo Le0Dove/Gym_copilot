@@ -7,30 +7,17 @@ import 'screens/exercise_library_screen.dart';
 import 'screens/plan_screen.dart';
 import 'screens/profile_screen.dart';
 import 'services/notification_service.dart';
-import 'database/database_helper.dart';
-import 'data/exercise_data.dart';
+import 'services/update_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (!kIsWeb) {
     await NotificationService.instance.init();
-    await _insertTestData();
+    UpdateService.instance.checkAndUpdateOnStartup();
   }
 
   runApp(const GymCopilotApp());
-}
-
-Future<void> _insertTestData() async {
-  final db = await DatabaseHelper.instance.database;
-
-  final existing = await db.query('exercises');
-  if (existing.isEmpty) {
-    final builtIn = ExerciseData.getBuiltInExercises();
-    for (var exercise in builtIn) {
-      await db.insert('exercises', exercise.toMap());
-    }
-  }
 }
 
 class GymCopilotApp extends StatelessWidget {
@@ -149,7 +136,7 @@ class GymCopilotApp extends StatelessWidget {
             letterSpacing: 0.8,
           ),
         ),
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           color: const Color(0xFF141414),
           elevation: 0,
           shape: RoundedRectangleBorder(

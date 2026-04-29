@@ -254,8 +254,7 @@ class DatabaseHelper {
     });
   }
 
-  // ignore: unused_element
-  Future<void> _updateExerciseUsage(dynamic dbOrTxn, int exerciseId,
+  Future<void> _updateExerciseUsage(DatabaseExecutor dbOrTxn, int exerciseId,
       String exerciseName, DateTime dateTime) async {
     final existing = await dbOrTxn.query(
       'exercise_usage',
@@ -455,6 +454,9 @@ class DatabaseHelper {
     await db.delete('exercise_sets');
     await db.delete('workout_records');
     await db.delete('workout_plans');
+    await db.delete('workout_templates');
+    await db.delete('workout_in_progress');
+    await db.delete('user_body_data');
     // 不删除 exercises 表，保留内置动作
   }
 
@@ -584,6 +586,7 @@ class DatabaseHelper {
     final records = await db.query('workout_records');
     final sets = await db.query('exercise_sets');
     final templates = await db.query('workout_templates');
+    final plans = await db.query('workout_plans');
     final bodyData = await db.query('user_body_data');
 
     return {
@@ -594,6 +597,7 @@ class DatabaseHelper {
       'workout_records': records,
       'exercise_sets': sets,
       'workout_templates': templates,
+      'workout_plans': plans,
       'user_body_data': bodyData,
     };
   }
@@ -610,6 +614,7 @@ class DatabaseHelper {
       await txn.delete('exercise_sets');
       await txn.delete('workout_records');
       await txn.delete('workout_templates');
+      await txn.delete('workout_plans');
       await txn.delete('user_body_data');
 
       // 导入自定义动作
@@ -649,6 +654,14 @@ class DatabaseHelper {
       if (templates != null) {
         for (var template in templates) {
           await txn.insert('workout_templates', template as Map<String, dynamic>);
+        }
+      }
+
+      // 导入训练计划
+      final plans = data['workout_plans'] as List<dynamic>?;
+      if (plans != null) {
+        for (var plan in plans) {
+          await txn.insert('workout_plans', plan as Map<String, dynamic>);
         }
       }
 

@@ -59,6 +59,13 @@ GeneratedPluginRegistrant.*
 *.apk
 *.aab
 
+# Database files
+*.db
+
+# Keystore files
+*.jks
+*.keystore
+
 # Screenshots (if not needed in repo)
 /screenshots/
 

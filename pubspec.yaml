@@ -1,5 +1,5 @@
 name: gym_copilot
-description: "A new Flutter project."
+description: "智能健身训练跟踪与数据分析助手"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -34,17 +34,18 @@ dependencies:
   sqflite: ^2.3.2
   path: ^1.9.0
   path_provider: ^2.1.2
-  flutter_local_notifications: ^16.3.2
-  timezone: ^0.9.4
-  intl: ^0.19.0
-  fl_chart: ^0.66.0
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.10.1
+  intl: ^0.20.2
+  fl_chart: ^0.71.0
+  shorebird_code_push: ^1.1.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   sqflite_common_ffi: ^2.3.2
-  flutter_lints: ^3.0.0
-  flutter_launcher_icons: ^0.13.1
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -59,6 +60,7 @@ flutter:
 
   assets:
     - assets/logo.png
+    - shorebird.yaml
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -94,3 +96,6 @@ flutter_launcher_icons:
 
 # For details regarding fonts from package dependencies,
 # see https://flutter.dev/custom-fonts/#from-packages
+
+dependency_overrides:
+  path_provider_android: 2.2.15

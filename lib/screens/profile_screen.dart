@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../database/database_helper.dart';
 import '../models/workout_record.dart';
 import '../data/exercise_data.dart';
+import '../services/update_service.dart';
 import 'personal_data_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -59,38 +59,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final sorted = _bodyPartStats.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
     return ExerciseData.getTagDisplayName(sorted.first.key);
-  }
-
-  // ignore: unused_element
-  void _deleteRecord(WorkoutRecord record) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('删除记录'),
-        content: Text(
-            '确定要删除 ${DateFormat('yyyy-MM-dd').format(record.dateTime)} 的训练记录吗？'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('删除'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      await DatabaseHelper.instance.deleteWorkoutRecord(record.id!);
-      _loadData();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('记录已删除')),
-        );
-      }
-    }
   }
 
   @override
@@ -320,9 +288,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const Divider(height: 1, indent: 56),
             _buildSettingItem(
+              icon: Icons.system_update_outlined,
+              title: '检查更新',
+              subtitle: '检查是否有新版本可用',
+              onTap: _checkForUpdate,
+              theme: theme,
+            ),
+            const Divider(height: 1, indent: 56),
+            _buildSettingItem(
               icon: Icons.delete_outline,
               title: '删除所有记录',
-              subtitle: '清除所有历史训练数据',
+              subtitle: '清除所有训练数据、计划、模板及身体数据',
               onTap: _deleteAllRecords,
               theme: theme,
             ),
@@ -388,12 +364,83 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  void _checkForUpdate() async {
+    final service = UpdateService.instance;
+    if (!service.isSupported) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('当前平台不支持热更新')),
+        );
+      }
+      return;
+    }
+
+    await service.checkForUpdate();
+
+    if (!mounted) return;
+
+    switch (UpdateService.statusNotifier.value) {
+      case UpdateStatus.updateAvailable:
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('发现新版本'),
+            content: const Text('检测到可用的更新补丁，是否立即下载？'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('稍后'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('下载'),
+              ),
+            ],
+          ),
+        );
+
+        if (confirmed == true && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('正在下载更新...')),
+          );
+          final success = await service.downloadUpdate();
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(success
+                    ? '更新已就绪，重启应用后生效'
+                    : '下载失败，请稍后重试'),
+              ),
+            );
+          }
+        }
+        break;
+      case UpdateStatus.upToDate:
+        final patchNum = await service.currentPatchVersion;
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('已是最新版本 (补丁 #${patchNum ?? 0})'),
+            ),
+          );
+        }
+        break;
+      case UpdateStatus.error:
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('检查更新失败，请检查网络连接')),
+        );
+        break;
+      default:
+        break;
+    }
+  }
+
   void _deleteAllRecords() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('删除所有记录'),
-        content: const Text('确定要删除所有历史训练记录吗？此操作不可恢复。'),
+        content: const Text('确定要删除所有训练记录、训练计划、模板和个人身体数据吗？此操作不可恢复。'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -429,6 +476,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
       return;
     }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('导出备份'),
+        content: const Text('备份数据包含你的体重、体脂等个人身体数据，将以明文JSON格式导出。请妥善保管，勿在不信任的环境中分享。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('继续导出'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
 
     final jsonString = const JsonEncoder.withIndent('  ').convert(data);
 

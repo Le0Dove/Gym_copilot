@@ -258,8 +258,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
-
   Widget _buildSectionTitle(String title, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 32, 20, 12),
