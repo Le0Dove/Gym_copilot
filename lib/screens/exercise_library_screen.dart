@@ -482,13 +482,6 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
               ),
               const SizedBox(height: 12),
               _buildDetailRow(
-                icon: Icons.category,
-                label: '动作类型',
-                value: exercise.isBuiltIn ? '内置动作' : '自定义动作',
-                theme: theme,
-              ),
-              const SizedBox(height: 12),
-              _buildDetailRow(
                 icon: Icons.fitness_center,
                 label: '关联部位',
                 value: exercise.targetMuscles.isNotEmpty
