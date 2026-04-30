@@ -134,6 +134,30 @@ class HomeScreenState extends State<HomeScreen>
                     SliverToBoxAdapter(
                       child: _buildHeader(theme),
                     ),
+                    // 调试信息：显示记录数量
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.surfaceVariant,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                '总记录: ${_records.length} | 今日: ${_todayRecords.length} | 历史: ${_pastRecords.length}',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                     if (_todayRecords.isNotEmpty) ...[
                       SliverToBoxAdapter(
                         child: _buildSectionTitle('今日训练', theme),
@@ -151,9 +175,24 @@ class HomeScreenState extends State<HomeScreen>
                     SliverToBoxAdapter(
                       child: _buildSectionTitle('历史记录', theme),
                     ),
-                    if (_pastRecords.isEmpty)
+                    if (_pastRecords.isEmpty && _todayRecords.isEmpty)
                       SliverToBoxAdapter(
                         child: _buildEmptyState(theme),
+                      )
+                    else if (_pastRecords.isEmpty)
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 20, horizontal: 20),
+                          child: Center(
+                            child: Text(
+                              '今日有训练记录，历史记录为空',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                        ),
                       )
                     else
                       SliverList(
@@ -182,12 +221,15 @@ class HomeScreenState extends State<HomeScreen>
                 flex: 2,
                 child: FilledButton.icon(
                   onPressed: () async {
-                    await Navigator.push(
+                    final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => const WorkoutScreen(),
                       ),
                     );
+                    debugPrint('WorkoutScreen 返回结果: $result');
+                    // 延迟确保数据库操作完成
+                    await Future.delayed(const Duration(milliseconds: 500));
                     loadData();
                   },
                   icon: const Icon(Icons.add, size: 20),
@@ -359,6 +401,31 @@ class HomeScreenState extends State<HomeScreen>
                 foregroundColor: theme.colorScheme.onPrimary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // 调试按钮：插入测试数据
+            OutlinedButton.icon(
+              onPressed: () async {
+                try {
+                  await DatabaseHelper.instance.insertTestData();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('测试数据已插入')),
+                  );
+                  loadData();
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('插入失败: $e')),
+                  );
+                }
+              },
+              icon: const Icon(Icons.bug_report, size: 16),
+              label: const Text('插入测试数据（调试用）'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: theme.colorScheme.onSurfaceVariant,
+                side: BorderSide(
+                  color: theme.colorScheme.outline.withOpacity(0.5),
                 ),
               ),
             ),

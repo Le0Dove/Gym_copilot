@@ -405,6 +405,46 @@ class DatabaseHelper {
     );
   }
 
+  // 插入测试数据用于诊断
+  Future<void> insertTestData() async {
+    if (kIsWeb) return;
+    try {
+      final db = await database;
+      await db.transaction((txn) async {
+        // 插入测试记录
+        final recordId = await txn.insert('workout_records', {
+          'dateTime': DateTime.now().toIso8601String(),
+          'bodyPart': 'chest',
+          'durationMinutes': 30,
+          'fatigueLevel': 5,
+        });
+        debugPrint('测试记录插入成功，ID=$recordId');
+
+        // 插入测试动作组
+        await txn.insert('exercise_sets', {
+          'recordId': recordId,
+          'exerciseId': 1,
+          'exerciseName': '测试动作',
+          'exerciseTag': 'chest',
+          'weight': 20.0,
+          'reps': 10,
+          'setNumber': 1,
+        });
+        debugPrint('测试动作组插入成功');
+      });
+    } catch (e, stackTrace) {
+      debugPrint('插入测试数据失败: $e');
+      debugPrint('堆栈跟踪: $stackTrace');
+      rethrow;
+    }
+  }
+
+  // 获取数据库路径用于诊断
+  Future<String> getDatabasePath() async {
+    final dbPath = await getDatabasesPath();
+    return dbPath;
+  }
+
   Future<int> insertWorkoutPlan(WorkoutPlan plan) async {
     if (kIsWeb) {
       plan.id = _webIdCounter++;
