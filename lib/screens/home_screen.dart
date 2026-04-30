@@ -134,74 +134,21 @@ class HomeScreenState extends State<HomeScreen>
                     SliverToBoxAdapter(
                       child: _buildHeader(theme),
                     ),
-                    // 调试信息：显示记录数量
                     SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.surfaceVariant,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                '总记录: ${_records.length} | 今日: ${_todayRecords.length} | 历史: ${_pastRecords.length}',
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      child: _buildSectionTitle('训练记录', theme),
                     ),
-                    if (_todayRecords.isNotEmpty) ...[
-                      SliverToBoxAdapter(
-                        child: _buildSectionTitle('今日训练', theme),
-                      ),
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) => _buildRecordCard(
-                            _todayRecords[index],
-                            theme,
-                          ),
-                          childCount: _todayRecords.length,
-                        ),
-                      ),
-                    ],
-                    SliverToBoxAdapter(
-                      child: _buildSectionTitle('历史记录', theme),
-                    ),
-                    if (_pastRecords.isEmpty && _todayRecords.isEmpty)
+                    if (_records.isEmpty)
                       SliverToBoxAdapter(
                         child: _buildEmptyState(theme),
-                      )
-                    else if (_pastRecords.isEmpty)
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 20, horizontal: 20),
-                          child: Center(
-                            child: Text(
-                              '今日有训练记录，历史记录为空',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                        ),
                       )
                     else
                       SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (context, index) => _buildRecordCard(
-                            _pastRecords[index],
+                            _records[index],
                             theme,
                           ),
-                          childCount: _pastRecords.length,
+                          childCount: _records.length,
                         ),
                       ),
                     const SliverToBoxAdapter(
