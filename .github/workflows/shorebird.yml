@@ -33,6 +33,10 @@ on:
         description: 'Release version for patch (e.g., 1.0.0+1)'
         required: false
         default: 'latest'
+      flutter_version:
+        description: 'Flutter version (e.g., 3.24.5)'
+        required: false
+        default: '3.24.5'
 
 jobs:
   shorebird:
@@ -62,7 +66,7 @@ jobs:
 
       - name: Shorebird Release
         if: ${{ inputs.command == 'release' }}
-        run: shorebird release ${{ inputs.platform }} --artifact ${{ inputs.artifact }} -- --no-tree-shake-icons
+        run: shorebird release ${{ inputs.platform }} --artifact ${{ inputs.artifact }} --flutter-version=${{ inputs.flutter_version }} -- --no-tree-shake-icons
         env:
           SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
 
@@ -83,4 +87,4 @@ jobs:
             ARGS="--release-version=${{ inputs.release_version }}"
           fi
           echo "Running: shorebird patch ${{ inputs.platform }} $ARGS"
-          shorebird patch ${{ inputs.platform }} $ARGS
+          shorebird patch ${{ inputs.platform }} --flutter-version=${{ inputs.flutter_version }} $ARGS
