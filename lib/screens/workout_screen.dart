@@ -83,16 +83,11 @@ class _WorkoutScreenState extends State<WorkoutScreen>
   }
 
   void _applyTemplate() {
-    if (widget.templateBodyPart != null) {
+    if (widget.templateExercises != null && widget.templateExercises!.isNotEmpty) {
       setState(() {
-        _selectedBodyPart = widget.templateBodyPart;
         _isUsingTemplate = true;
       });
-
-      // 将模板中的动作添加到训练列表
-      if (widget.templateExercises != null) {
-        _loadTemplateExercises();
-      }
+      _loadTemplateExercises();
     }
   }
 
@@ -177,7 +172,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
 
         setState(() {
           _startTime = DateTime.parse(startTimeStr);
-          _selectedBodyPart = bodyPart;
+          _selectedBodyPart = bodyPart ?? 'mixed';
           _fatigueLevel = fatigueLevel;
           _sets.clear();
           _sets.addAll(restoredSets);
@@ -235,7 +230,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
 
     await DatabaseHelper.instance.saveWorkoutInProgress(
       startTime: _startTime,
-      bodyPart: _selectedBodyPart,
+      bodyPart: _selectedBodyPart ?? 'mixed',
       fatigueLevel: _fatigueLevel,
       sets: setsData,
     );
@@ -401,7 +396,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
     );
   }
 
-  // 顶部区域：计时器 + 训练部位
+  // 顶部区域：计时器
   Widget _buildHeaderSection(int minutes, int seconds, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
@@ -414,16 +409,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
           ),
         ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // 计时器区域
-          _buildCompactTimer(minutes, seconds, theme),
-          const SizedBox(height: 16),
-          // 训练部位选择
-          _buildBodyPartSelector(theme),
-        ],
-      ),
+      child: _buildCompactTimer(minutes, seconds, theme),
     );
   }
 
@@ -662,90 +648,6 @@ class _WorkoutScreenState extends State<WorkoutScreen>
     _saveTimer = Timer.periodic(const Duration(seconds: 10), (_) {
       _persistWorkoutState();
     });
-  }
-
-  Widget _buildBodyPartSelector(ThemeData theme) {
-    final tags = ExerciseData.getAllTags();
-    const int crossAxisCount = 3;
-    const double spacing = 12;
-    const double runSpacing = 12;
-    final double itemWidth =
-        (MediaQuery.of(context).size.width - 40 - spacing * (crossAxisCount - 1)) / crossAxisCount;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '训练部位',
-            style: theme.textTheme.titleMedium,
-          ),
-          const SizedBox(height: 16),
-          Center(
-            child: Wrap(
-              spacing: spacing,
-              runSpacing: runSpacing,
-              alignment: WrapAlignment.center,
-              children: tags.map((tag) {
-                final isSelected = _selectedBodyPart == tag;
-                return GestureDetector(
-                  onTap: _isTimerRunning
-                      ? null
-                      : () {
-                          setState(() {
-                            _selectedBodyPart = isSelected ? null : tag;
-                          });
-                        },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: itemWidth,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 14,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? theme.colorScheme.primary
-                          : _isTimerRunning
-                              ? theme.colorScheme.surfaceVariant.withOpacity(0.5)
-                              : theme.colorScheme.surfaceVariant,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: isSelected
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.outline.withOpacity(0.1),
-                        width: 1.5,
-                      ),
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
-                                color: theme.colorScheme.primary.withOpacity(0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ]
-                          : null,
-                    ),
-                    child: Text(
-                      ExerciseData.getTagDisplayName(tag),
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.labelMedium!.copyWith(
-                        color: isSelected
-                            ? theme.colorScheme.onPrimary
-                            : _isTimerRunning
-                                ? theme.colorScheme.onSurface.withOpacity(0.4)
-                                : theme.colorScheme.onSurface,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _buildSetsList(ThemeData theme) {
