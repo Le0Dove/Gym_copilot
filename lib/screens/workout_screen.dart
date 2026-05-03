@@ -326,14 +326,12 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                 ],
               ),
             ),
-      floatingActionButton: _selectedBodyPart != null
-          ? FloatingActionButton(
-              onPressed: _addExerciseSet,
-              elevation: 6,
-              highlightElevation: 12,
-              child: const Icon(Icons.add),
-            )
-          : null,
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addExerciseSet,
+        elevation: 6,
+        highlightElevation: 12,
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
@@ -916,15 +914,13 @@ class _WorkoutScreenState extends State<WorkoutScreen>
   void _editTemplateSet(int index) async {
     // 编辑模板动作
     final set = _sets[index];
-    final filteredExercises =
-        _exercises.where((e) => e.tag == _selectedBodyPart).toList();
 
     final result = await showModalBottomSheet<ExerciseSet?>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => _EditSetBottomSheet(
-        exercises: filteredExercises,
+        exercises: _exercises,
         set: set,
         setNumber: set.setNumber,
       ),
@@ -1061,19 +1057,12 @@ class _WorkoutScreenState extends State<WorkoutScreen>
   }
 
   Future<void> _addExerciseSet() async {
-    if (_selectedBodyPart == null) return;
-
-    final filteredExercises =
-        _exercises.where((e) => e.tag == _selectedBodyPart).toList();
-
-    if (filteredExercises.isEmpty) return;
-
     final result = await showModalBottomSheet<List<ExerciseSet>?>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => _AddSetBottomSheet(
-        exercises: filteredExercises,
+        exercises: _exercises,
         setNumber: _sets.length + 1,
       ),
     );
@@ -1088,14 +1077,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
   }
 
   void _finishWorkout() {
-    if (_selectedBodyPart == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请选择训练部位')),
-      );
-      return;
-    }
-
-    // 如果是模板训练且没有添加动作，询问是否结束
+    // 如果没有添加动作，询问是否结束
     if (_sets.isEmpty) {
       if (_isUsingTemplate) {
         _showEmptyWorkoutConfirmDialog();
@@ -1115,6 +1097,12 @@ class _WorkoutScreenState extends State<WorkoutScreen>
         : const Duration(seconds: 0);
     final finalDurationMinutes = elapsed.inMinutes;
 
+    // 从动作中推断训练部位
+    final bodyParts = _sets.map((s) => s.exerciseTag).toSet().toList();
+    final bodyPartDisplay = bodyParts.length > 1
+        ? '混合 (${bodyParts.map((tag) => ExerciseData.getTagDisplayName(tag)).join('、')})'
+        : ExerciseData.getTagDisplayName(bodyParts.first);
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1125,8 +1113,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _summaryText(
-                  '训练部位', ExerciseData.getTagDisplayName(_selectedBodyPart!)),
+              _summaryText('训练部位', bodyPartDisplay),
               _summaryText('训练时长', '$finalDurationMinutes 分钟'),
               _summaryText('动作组数', '${_sets.length} 组'),
               _summaryText('疲劳度', '$_fatigueLevel / 10'),
@@ -1156,9 +1143,13 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                 });
                 Navigator.of(dialogContext).pop();
 
+                // 从动作中推断训练部位
+                final bodyParts = _sets.map((s) => s.exerciseTag).toSet().toList();
+                final primaryBodyPart = bodyParts.length > 1 ? 'mixed' : bodyParts.first;
+
                 final record = WorkoutRecord(
                   dateTime: _startTime,
-                  bodyPart: _selectedBodyPart!,
+                  bodyPart: primaryBodyPart,
                   durationMinutes: finalDurationMinutes,
                   fatigueLevel: _fatigueLevel,
                   exerciseSets: _sets,
@@ -1264,7 +1255,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
 
     final record = WorkoutRecord(
       dateTime: _startTime,
-      bodyPart: _selectedBodyPart!,
+      bodyPart: _selectedBodyPart ?? 'mixed',
       durationMinutes: finalDurationMinutes,
       fatigueLevel: _fatigueLevel,
       exerciseSets: [],
@@ -1312,14 +1303,21 @@ class _AddSetBottomSheet extends StatefulWidget {
 }
 
 class _AddSetBottomSheetState extends State<_AddSetBottomSheet> {
+  String? _selectedTag;
   Exercise? _selectedExercise;
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _repsController = TextEditingController();
   final TextEditingController _setsController = TextEditingController(text: '1');
 
+  List<Exercise> get _filteredExercises {
+    if (_selectedTag == null) return widget.exercises;
+    return widget.exercises.where((e) => e.tag == _selectedTag).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final tags = ExerciseData.getAllTags();
 
     return Container(
       padding: EdgeInsets.only(
@@ -1351,7 +1349,41 @@ class _AddSetBottomSheetState extends State<_AddSetBottomSheet> {
             '添加第 ${widget.setNumber} 组',
             style: theme.textTheme.headlineSmall!,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
+          // 部位选择标签
+          SizedBox(
+            height: 40,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: tags.length,
+              itemBuilder: (context, index) {
+                final tag = tags[index];
+                final isSelected = _selectedTag == tag;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: ChoiceChip(
+                    label: Text(ExerciseData.getTagDisplayName(tag)),
+                    selected: isSelected,
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedTag = selected ? tag : null;
+                        _selectedExercise = null;
+                      });
+                    },
+                    selectedColor: theme.colorScheme.primary,
+                    backgroundColor: theme.colorScheme.surfaceVariant,
+                    labelStyle: TextStyle(
+                      color: isSelected
+                          ? theme.colorScheme.onPrimary
+                          : theme.colorScheme.onSurface,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
@@ -1361,21 +1393,26 @@ class _AddSetBottomSheetState extends State<_AddSetBottomSheet> {
             child: DropdownButtonHideUnderline(
               child: DropdownButton<Exercise>(
                 value: _selectedExercise,
-                hint: Text('选择动作', style: theme.textTheme.bodyMedium!),
+                hint: Text(
+                  _selectedTag == null ? '请先选择部位' : '选择动作',
+                  style: theme.textTheme.bodyMedium!,
+                ),
                 isExpanded: true,
                 dropdownColor: theme.colorScheme.surfaceVariant,
                 style: theme.textTheme.bodyMedium!,
-                items: widget.exercises.map((exercise) {
+                items: _filteredExercises.map((exercise) {
                   return DropdownMenuItem(
                     value: exercise,
                     child: Text(exercise.name),
                   );
                 }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedExercise = value;
-                  });
-                },
+                onChanged: _selectedTag == null
+                    ? null
+                    : (value) {
+                        setState(() {
+                          _selectedExercise = value;
+                        });
+                      },
               ),
             ),
           ),
