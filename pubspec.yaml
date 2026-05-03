@@ -37,8 +37,7 @@ flutter:
     - assets/logo.png
     - shorebird.yaml
 
-dependency_overrides:
-  fl_chart: 0.66.2
+
 
 flutter_launcher_icons:
   android: "launcher_icon"
@@ -48,4 +47,3 @@ flutter_launcher_icons:
   remove_alpha_ios: true
   adaptive_icon_background: "assets/app_icon_rounded.png"
   adaptive_icon_foreground: "assets/app_icon_rounded.png"
-
