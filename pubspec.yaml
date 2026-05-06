@@ -38,7 +38,7 @@ flutter:
     - shorebird.yaml
 
 dependency_overrides:
-  win32: 5.4.0
+  win32: 5.5.1
 
 flutter_launcher_icons:
   android: "launcher_icon"
