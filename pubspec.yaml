@@ -37,7 +37,8 @@ flutter:
     - assets/logo.png
     - shorebird.yaml
 
-
+dependency_overrides:
+  win32: 5.4.0
 
 flutter_launcher_icons:
   android: "launcher_icon"
