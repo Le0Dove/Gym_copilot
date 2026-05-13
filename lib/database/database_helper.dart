@@ -35,7 +35,7 @@ class DatabaseHelper {
 
       return await openDatabase(
         path,
-        version: 6,
+        version: 7,
         onCreate: _createDB,
         onUpgrade: _upgradeDB,
         onConfigure: (db) async {
@@ -89,6 +89,7 @@ class DatabaseHelper {
         weight REAL NOT NULL,
         reps INTEGER NOT NULL,
         setNumber INTEGER NOT NULL,
+        isTemplate INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY (recordId) REFERENCES workout_records (id) ON DELETE CASCADE
       )
     ''');
@@ -192,6 +193,11 @@ class DatabaseHelper {
       // 版本6: 添加 targetMuscles 列到 exercises 表
       await db.execute(
           'ALTER TABLE exercises ADD COLUMN targetMuscles TEXT DEFAULT \'\'');
+    }
+    if (oldVersion < 7) {
+      // 版本7: 添加 isTemplate 列到 exercise_sets 表
+      await db.execute(
+          'ALTER TABLE exercise_sets ADD COLUMN isTemplate INTEGER NOT NULL DEFAULT 0');
     }
   }
 
@@ -392,6 +398,135 @@ class DatabaseHelper {
     return null;
   }
 
+  // ===== Streak 功能 =====
+
+  /// 获取所有训练日期的唯一列表（按日期去重，仅含日期部分）
+  Future<List<DateTime>> getUniqueWorkoutDates() async {
+    if (kIsWeb) {
+      final dates = _webRecords
+          .map((r) => DateTime(r.dateTime.year, r.dateTime.month, r.dateTime.day))
+          .toSet()
+          .toList();
+      dates.sort((a, b) => b.compareTo(a));
+      return dates;
+    }
+    final db = await database;
+    final result = await db.rawQuery('''
+      SELECT DISTINCT 
+        substr(dateTime, 1, 10) as dateStr
+      FROM workout_records
+      ORDER BY dateStr DESC
+    ''');
+    return result
+        .map((row) => DateTime.parse(row['dateStr'] as String))
+        .toList();
+  }
+
+  /// 计算当前连续训练天数（Streak）
+  Future<int> getCurrentStreak() async {
+    final dates = await getUniqueWorkoutDates();
+    if (dates.isEmpty) return 0;
+
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+    final yesterdayDate = todayDate.subtract(const Duration(days: 1));
+
+    // 检查今天或昨天是否有训练
+    bool hasToday = dates.any((d) => d.isAtSameMomentAs(todayDate));
+    bool hasYesterday = dates.any((d) => d.isAtSameMomentAs(yesterdayDate));
+
+    if (!hasToday && !hasYesterday) {
+      // 今天和昨天都没训练，streak 已断
+      return 0;
+    }
+
+    int streak = 0;
+    DateTime checkDate = hasToday ? todayDate : yesterdayDate;
+
+    for (final date in dates) {
+      if (date.isAtSameMomentAs(checkDate)) {
+        streak++;
+        checkDate = checkDate.subtract(const Duration(days: 1));
+      } else if (date.isBefore(checkDate)) {
+        break;
+      }
+    }
+
+    return streak;
+  }
+
+  /// 获取最长连续训练天数记录
+  Future<int> getLongestStreak() async {
+    final dates = await getUniqueWorkoutDates();
+    if (dates.isEmpty) return 0;
+
+    // 按升序排列以便计算
+    dates.sort((a, b) => a.compareTo(b));
+
+    int maxStreak = 1;
+    int currentStreak = 1;
+
+    for (int i = 1; i < dates.length; i++) {
+      final diff = dates[i].difference(dates[i - 1]).inDays;
+      if (diff == 1) {
+        currentStreak++;
+        if (currentStreak > maxStreak) {
+          maxStreak = currentStreak;
+        }
+      } else if (diff > 1) {
+        currentStreak = 1;
+      }
+    }
+
+    return maxStreak;
+  }
+
+  /// 检查是否已经断签（超过1天没有训练）
+  Future<bool> isStreakBroken() async {
+    final dates = await getUniqueWorkoutDates();
+    if (dates.isEmpty) return false;
+
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+    final yesterdayDate = todayDate.subtract(const Duration(days: 1));
+
+    bool hasToday = dates.any((d) => d.isAtSameMomentAs(todayDate));
+    bool hasYesterday = dates.any((d) => d.isAtSameMomentAs(yesterdayDate));
+
+    return !hasToday && !hasYesterday;
+  }
+
+  /// 获取断签天数
+  Future<int> getDaysSinceLastWorkout() async {
+    final dates = await getUniqueWorkoutDates();
+    if (dates.isEmpty) return -1;
+
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+    final latestDate = dates.first;
+
+    return todayDate.difference(latestDate).inDays;
+  }
+
+  /// 获取某个月的训练日期列表（用于热力图）
+  Future<List<DateTime>> getWorkoutDatesInMonth(int year, int month) async {
+    if (kIsWeb) {
+      return _webRecords
+          .where((r) => r.dateTime.year == year && r.dateTime.month == month)
+          .map((r) => DateTime(r.dateTime.year, r.dateTime.month, r.dateTime.day))
+          .toSet()
+          .toList();
+    }
+    final db = await database;
+    final result = await db.rawQuery('''
+      SELECT DISTINCT substr(dateTime, 1, 10) as dateStr
+      FROM workout_records
+      WHERE substr(dateTime, 1, 7) = ?
+      ORDER BY dateStr ASC
+    ''', ['$year-${month.toString().padLeft(2, '0')}']);
+    return result.map((row) => DateTime.parse(row['dateStr'] as String)).toList();
+  }
+
   Future<int> deleteWorkoutRecord(int id) async {
     if (kIsWeb) {
       _webRecords.removeWhere((r) => r.id == id);
@@ -478,12 +613,14 @@ class DatabaseHelper {
       return null;
     }
     final db = await database;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     final result = await db.query(
       'workout_plans',
       where: 'startDate <= ? AND endDate >= ?',
       whereArgs: [
-        DateTime.now().toIso8601String(),
-        DateTime.now().toIso8601String()
+        today.toIso8601String(),
+        today.toIso8601String()
       ],
       orderBy: 'startDate DESC',
       limit: 1,

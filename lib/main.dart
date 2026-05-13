@@ -32,6 +32,38 @@ class GymCopilotProApp extends StatelessWidget {
       theme: _buildDarkTheme(),
       navigatorObservers: [routeObserver],
       home: const MainNavigationScreen(),
+      // 全局页面转场动画
+      onGenerateRoute: (settings) {
+        return PageRouteBuilder(
+          settings: settings,
+          pageBuilder: (context, animation, secondaryAnimation) {
+            final Widget page;
+            switch (settings.name) {
+              case '/':
+                page = const MainNavigationScreen();
+                break;
+              default:
+                page = const MainNavigationScreen();
+            }
+            return page;
+          },
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const begin = Offset(0.0, 0.05);
+            const end = Offset.zero;
+            const curve = Curves.easeOutCubic;
+            var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+            var fadeTween = Tween<double>(begin: 0.0, end: 1.0).chain(CurveTween(curve: curve));
+            return FadeTransition(
+              opacity: animation.drive(fadeTween),
+              child: SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              ),
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        );
+      },
     );
   }
 
@@ -39,7 +71,6 @@ class GymCopilotProApp extends StatelessWidget {
     const primary = Color(0xFFF97316);
     const onPrimary = Color(0xFF0F172A);
     const secondary = Color(0xFFFB923C);
-    const accent = Color(0xFF22C55E);
     const background = Color(0xFF0B0F19);
     const surface = Color(0xFF1A1F2E);
     const surfaceVariant = Color(0xFF242B3D);
@@ -62,7 +93,7 @@ class GymCopilotProApp extends StatelessWidget {
         onSecondary: foreground,
         surface: surface,
         onSurface: foreground,
-        surfaceVariant: surfaceVariant,
+        surfaceContainerHighest: surfaceVariant,
         onSurfaceVariant: muted,
         outline: border,
         error: error,
@@ -165,9 +196,10 @@ class GymCopilotProApp extends StatelessWidget {
           letterSpacing: 0.8,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: surface,
-        elevation: 0,
+        elevation: 2,
+        shadowColor: Colors.black.withAlpha(76),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: const BorderSide(color: border, width: 1),
@@ -190,7 +222,7 @@ class GymCopilotProApp extends StatelessWidget {
         type: BottomNavigationBarType.fixed,
         elevation: 0,
       ),
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         backgroundColor: background,
         elevation: 0,
         centerTitle: false,
@@ -200,7 +232,7 @@ class GymCopilotProApp extends StatelessWidget {
           color: foreground,
           letterSpacing: -0.5,
         ),
-        iconTheme: const IconThemeData(color: foreground),
+        iconTheme: IconThemeData(color: foreground),
       ),
       dividerTheme: const DividerThemeData(
         color: border,
@@ -208,7 +240,7 @@ class GymCopilotProApp extends StatelessWidget {
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: surfaceVariant,
-        contentTextStyle: TextStyle(
+        contentTextStyle: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: foreground,
@@ -218,10 +250,12 @@ class GymCopilotProApp extends StatelessWidget {
         ),
         behavior: SnackBarBehavior.floating,
       ),
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: primary,
         foregroundColor: onPrimary,
-        elevation: 0,
+        elevation: 4,
+        highlightElevation: 8,
+        splashColor: primary.withAlpha(51),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -231,7 +265,9 @@ class GymCopilotProApp extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          textStyle: TextStyle(
+          elevation: 2,
+          shadowColor: primary.withAlpha(102),
+          textStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.5,
@@ -246,7 +282,7 @@ class GymCopilotProApp extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          textStyle: TextStyle(
+          textStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.5,
@@ -269,7 +305,7 @@ class GymCopilotProApp extends StatelessWidget {
           borderSide: const BorderSide(color: primary, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        hintStyle: TextStyle(
+        hintStyle: const TextStyle(
           fontSize: 16,
           color: muted,
         ),
@@ -318,7 +354,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             }
           },
           backgroundColor: const Color(0xFF0B0F19),
-          indicatorColor: const Color(0xFFF97316).withOpacity(0.15),
+          indicatorColor: const Color(0xFFF97316).withAlpha(38),
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           destinations: const [
             NavigationDestination(

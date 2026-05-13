@@ -46,6 +46,7 @@ class ExerciseSet {
   double weight;
   int reps;
   int setNumber;
+  bool isTemplate;
 
   ExerciseSet({
     this.id,
@@ -56,6 +57,7 @@ class ExerciseSet {
     required this.weight,
     required this.reps,
     required this.setNumber,
+    this.isTemplate = false,
   });
 
   Map<String, dynamic> toMap() {
@@ -67,6 +69,7 @@ class ExerciseSet {
       'weight': weight,
       'reps': reps,
       'setNumber': setNumber,
+      'isTemplate': isTemplate ? 1 : 0,
     };
     if (id != null) {
       map['id'] = id;
@@ -84,6 +87,7 @@ class ExerciseSet {
       weight: map['weight'],
       reps: map['reps'],
       setNumber: map['setNumber'],
+      isTemplate: map['isTemplate'] == 1,
     );
   }
 }

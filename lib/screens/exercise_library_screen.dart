@@ -5,6 +5,7 @@ import 'package:animate_do/animate_do.dart';
 import '../database/database_helper.dart';
 import '../models/exercise.dart';
 import '../data/exercise_data.dart';
+import 'exercise_detail_screen.dart';
 
 class ExerciseLibraryScreen extends StatefulWidget {
   const ExerciseLibraryScreen({super.key});
@@ -65,7 +66,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
       debugPrint('加载动作失败: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text(
               '加载动作失败，请重试',
               style: TextStyle(color: _foreground),
@@ -101,7 +102,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
       appBar: AppBar(
         backgroundColor: _background,
         elevation: 0,
-        title: Text(
+        title: const Text(
           '动作库',
           style: TextStyle(
             fontSize: 24,
@@ -128,21 +129,21 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                 ),
                 child: TextField(
                   controller: _searchController,
-                  style: TextStyle(fontSize: 14, color: _foreground),
+                  style: const TextStyle(fontSize: 14, color: _foreground),
                   textAlignVertical: TextAlignVertical.center,
                   decoration: InputDecoration(
                     hintText: '搜索动作',
-                    hintStyle: TextStyle(
+                    hintStyle: const TextStyle(
                       fontSize: 14,
                       color: _muted,
                     ),
-                    prefixIcon: Icon(
+                    prefixIcon: const Icon(
                       Icons.search,
                       color: _muted,
                     ),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.clear,
                               color: _muted,
                             ),
@@ -211,7 +212,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                             color: _surface,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
-                              side: BorderSide(
+                              side: const BorderSide(
                                 color: _border,
                                 width: 1,
                               ),
@@ -230,7 +231,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                       height: 48,
                                       decoration: BoxDecoration(
                                         color: _getTagColor(exercise.tag)
-                                            .withOpacity(0.15),
+                                            .withAlpha(38),
                                         borderRadius:
                                             BorderRadius.circular(20),
                                       ),
@@ -251,7 +252,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                         children: [
                                           Text(
                                             exercise.name,
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w600,
                                               color: _foreground,
@@ -276,7 +277,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                                     mainAxisSize:
                                                         MainAxisSize.min,
                                                     children: [
-                                                      Icon(
+                                                      const Icon(
                                                         Icons.fitness_center,
                                                         size: 10,
                                                         color: _muted,
@@ -285,7 +286,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                                       Text(
                                                         '$useCount 次',
                                                         style:
-                                                            TextStyle(
+                                                            const TextStyle(
                                                           fontSize: 10,
                                                           fontWeight:
                                                               FontWeight.w500,
@@ -320,7 +321,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                             child: Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
-                                                Icon(
+                                                const Icon(
                                                   Icons.calendar_today,
                                                   size: 10,
                                                   color: _muted,
@@ -328,7 +329,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                                 const SizedBox(width: 4),
                                                 Text(
                                                   _formatDate(lastUsedDate),
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                     fontSize: 10,
                                                     fontWeight: FontWeight.w500,
                                                     color: _muted,
@@ -401,7 +402,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: _primary.withOpacity(0.3),
+                    color: _primary.withAlpha(76),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
@@ -454,10 +455,10 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
         return FadeInUp(
           child: Container(
             padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: _surface,
               borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(20)),
+                  BorderRadius.vertical(top: Radius.circular(20)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -480,7 +481,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: _getTagColor(exercise.tag).withOpacity(0.15),
+                        color: _getTagColor(exercise.tag).withAlpha(38),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Center(
@@ -498,7 +499,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                         children: [
                           Text(
                             exercise.name,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: _foreground,
@@ -507,7 +508,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                           const SizedBox(height: 4),
                           Text(
                             ExerciseData.getTagDisplayName(exercise.tag),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 14,
                               color: _muted,
                             ),
@@ -518,7 +519,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                Divider(color: _border),
+                const Divider(color: _border),
                 const SizedBox(height: 16),
                 _buildDetailRow(
                   icon: Icons.fitness_center,
@@ -542,18 +543,24 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                       : '暂无',
                 ),
                 const SizedBox(height: 24),
-                Divider(color: _border),
+                const Divider(color: _border),
                 const SizedBox(height: 8),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
                     onPressed: () {
                       Navigator.pop(context);
-                      _showExerciseHistory(exercise);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ExerciseDetailScreen(exercise: exercise),
+                        ),
+                      );
                     },
-                    icon: const Icon(Icons.history, size: 18),
-                    label: Text(
-                      '查看历史记录',
+                    icon: const Icon(Icons.insights, size: 18),
+                    label: const Text(
+                      '查看数据分析',
                       style: TextStyle(fontWeight: FontWeight.w600),
                     ),
                     style: FilledButton.styleFrom(
@@ -579,7 +586,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                         size: 18,
                         color: _error,
                       ),
-                      label: Text(
+                      label: const Text(
                         '删除动作',
                         style: TextStyle(
                           color: _error,
@@ -587,7 +594,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: _error.withOpacity(0.3)),
+                        side: BorderSide(color: _error.withAlpha(76)),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -596,206 +603,6 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                   ),
                 ],
                 const SizedBox(height: 32),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showExerciseHistory(Exercise exercise) async {
-    if (exercise.id == null) return;
-
-    final history =
-        await DatabaseHelper.instance.getExerciseHistory(exercise.id!);
-
-    if (!mounted) return;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return FadeInUp(
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: _surface,
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: _border,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: _getTagColor(exercise.tag).withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          _getTagIcon(exercise.tag),
-                          color: _getTagColor(exercise.tag),
-                          size: 24,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            exercise.name,
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: _foreground,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '历史记录',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: _muted,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                if (history.isEmpty)
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(32),
-                      child: FadeIn(
-                        child: Text(
-                          '暂无历史记录',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: _muted,
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                else
-                  Flexible(
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: history.length,
-                      itemBuilder: (context, index) {
-                        final record = history[index];
-                        final dateTime =
-                            DateTime.parse(record['dateTime'] as String);
-                        final weight = (record['weight'] as num).toDouble();
-                        final reps = record['reps'] as int;
-                        final setNumber = record['setNumber'] as int;
-                        final fatigueLevel = record['fatigueLevel'] as int;
-
-                        return FadeInUp(
-                          delay: Duration(milliseconds: index * 50),
-                          child: Card(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            color: _surfaceVariant,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 36,
-                                    height: 36,
-                                    decoration: BoxDecoration(
-                                      color: _background,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        '$setNumber',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                          color: _foreground,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          DateFormat('yyyy/MM/dd HH:mm')
-                                              .format(dateTime),
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: _muted,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          '${weight}kg × $reps次',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            color: _foreground,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: _background,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Text(
-                                      '疲劳$fatigueLevel',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w500,
-                                        color: _muted,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
               ],
             ),
           ),
@@ -831,7 +638,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
             children: [
               Text(
                 label,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
                   color: _muted,
                 ),
@@ -839,7 +646,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
               const SizedBox(height: 2),
               Text(
                 value,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: _foreground,
@@ -861,7 +668,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: Text(
+          title: const Text(
             '确认删除',
             style: TextStyle(
               fontSize: 24,
@@ -871,7 +678,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           ),
           content: Text(
             '确定要删除动作 "${exercise.name}" 吗？\n此操作不可撤销。',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               color: _foreground,
             ),
@@ -879,7 +686,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: Text(
+              child: const Text(
                 '取消',
                 style: TextStyle(color: _muted),
               ),
@@ -893,7 +700,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),
-              child: Text(
+              child: const Text(
                 '删除',
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
@@ -920,7 +727,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: Text(
+          title: const Text(
             '添加自定义动作',
             style: TextStyle(
               fontSize: 24,
@@ -933,8 +740,8 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
             children: [
               TextField(
                 controller: _customNameController,
-                style: TextStyle(color: _foreground),
-                decoration: InputDecoration(
+                style: const TextStyle(color: _foreground),
+                decoration: const InputDecoration(
                   labelText: '动作名称',
                   hintText: '例如：单臂哑铃划船',
                   labelStyle: TextStyle(color: _muted),
@@ -949,14 +756,14 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: selectedTag,
-                hint: Text(
+                initialValue: selectedTag,
+                hint: const Text(
                   '选择部位',
                   style: TextStyle(color: _muted),
                 ),
-                style: TextStyle(color: _foreground),
+                style: const TextStyle(color: _foreground),
                 dropdownColor: _surfaceVariant,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(color: _border),
                   ),
@@ -969,7 +776,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                     value: tag,
                     child: Text(
                       ExerciseData.getTagDisplayName(tag),
-                      style: TextStyle(color: _foreground),
+                      style: const TextStyle(color: _foreground),
                     ),
                   );
                 }).toList(),
@@ -982,8 +789,8 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
               const SizedBox(height: 16),
               TextField(
                 controller: _customTargetController,
-                style: TextStyle(color: _foreground),
-                decoration: InputDecoration(
+                style: const TextStyle(color: _foreground),
+                decoration: const InputDecoration(
                   labelText: '关联部位',
                   hintText: '例如：胸肌、肩前束',
                   labelStyle: TextStyle(color: _muted),
@@ -1001,7 +808,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(
+              child: const Text(
                 '取消',
                 style: TextStyle(color: _muted),
               ),
@@ -1027,7 +834,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),
-              child: Text(
+              child: const Text(
                 '添加',
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
@@ -1056,10 +863,10 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
               Icon(
                 Icons.search_off,
                 size: 48,
-                color: _muted.withOpacity(0.5),
+                color: _muted.withAlpha(127),
               ),
               const SizedBox(height: 16),
-              Text(
+              const Text(
                 '没有找到匹配的动作',
                 style: TextStyle(
                   fontSize: 16,
@@ -1072,7 +879,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12,
-                  color: _muted.withOpacity(0.7),
+                  color: _muted.withAlpha(178),
                 ),
               ),
               const SizedBox(height: 16),
@@ -1085,12 +892,12 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                       _filterExercises();
                     });
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.clear,
                     size: 18,
                     color: _primary,
                   ),
-                  label: Text(
+                  label: const Text(
                     '清除筛选',
                     style: TextStyle(color: _primary),
                   ),

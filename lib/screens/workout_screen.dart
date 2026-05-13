@@ -112,6 +112,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
             weight: weight,
             reps: reps,
             setNumber: setNumber++,
+            isTemplate: true,
           );
           _sets.add(exerciseSet);
         }
@@ -167,6 +168,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
             weight: (setMap['weight'] as num).toDouble(),
             reps: setMap['reps'] as int,
             setNumber: setMap['setNumber'] as int,
+            isTemplate: setMap['isTemplate'] == true,
           );
         }).toList();
 
@@ -225,6 +227,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
         'weight': set.weight,
         'reps': set.reps,
         'setNumber': set.setNumber,
+        'isTemplate': set.isTemplate,
       };
     }).toList();
 
@@ -262,7 +265,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.2),
+                  color: theme.colorScheme.primary.withAlpha(51),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -404,7 +407,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
         color: theme.colorScheme.surface,
         border: Border(
           bottom: BorderSide(
-            color: theme.colorScheme.outline.withOpacity(0.1),
+            color: theme.colorScheme.outline.withAlpha(25),
             width: 1,
           ),
         ),
@@ -473,7 +476,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                   height: 148,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: theme.colorScheme.primary.withOpacity(0.06),
+                    color: theme.colorScheme.primary.withAlpha(15),
                   ),
                 ),
               ),
@@ -490,12 +493,12 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                   shape: BoxShape.circle,
                   color: theme.colorScheme.surface,
                   border: Border.all(
-                    color: theme.colorScheme.primary.withOpacity(0.4),
+                    color: theme.colorScheme.primary.withAlpha(102),
                     width: 2,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: theme.colorScheme.primary.withOpacity(0.15),
+                      color: theme.colorScheme.primary.withAlpha(38),
                       blurRadius: 30,
                       spreadRadius: 6,
                     ),
@@ -527,103 +530,74 @@ class _WorkoutScreenState extends State<WorkoutScreen>
   }
 
   Widget _buildTimerDisplay(int minutes, int seconds, ThemeData theme) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // 计时器数字
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 分钟
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (child, animation) {
-                return SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0, -0.5),
-                    end: Offset.zero,
-                  ).animate(animation),
-                  child: FadeTransition(
-                    opacity: animation,
-                    child: child,
-                  ),
-                );
-              },
-              child: Text(
-                minutes.toString().padLeft(2, '0'),
-                key: ValueKey<int>(minutes),
-                style: theme.textTheme.displayLarge!.copyWith(
-                  fontSize: 48,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 2,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-            ),
-            Text(
-              ':',
-              style: theme.textTheme.displayLarge!.copyWith(
-                fontSize: 36,
-                fontWeight: FontWeight.w300,
-                color: theme.colorScheme.primary.withOpacity(0.5),
-              ),
-            ),
-            // 秒数
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (child, animation) {
-                return SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0, 0.5),
-                    end: Offset.zero,
-                  ).animate(animation),
-                  child: FadeTransition(
-                    opacity: animation,
-                    child: child,
-                  ),
-                );
-              },
-              child: Text(
-                seconds.toString().padLeft(2, '0'),
-                key: ValueKey<int>(seconds),
-                style: theme.textTheme.displayLarge!.copyWith(
-                  fontSize: 48,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 2,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-            ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            theme.colorScheme.surface.withAlpha(204),
+            theme.colorScheme.surface.withAlpha(102),
           ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
-        const SizedBox(width: 12),
-        // 状态指示器
-        AnimatedBuilder(
-          animation: _glowController,
-          builder: (context, child) {
-            return Container(
-              width: 10,
-              height: 10,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withOpacity(
-                  0.5 + 0.5 * _glowAnimation.value,
-                ),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: theme.colorScheme.primary.withOpacity(
-                      0.5 * _glowAnimation.value,
-                    ),
-                    blurRadius: 8,
-                    spreadRadius: 1,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: theme.colorScheme.outline.withAlpha(51),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(51),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 计时器数字
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 分钟
+              _buildTimeDigit(minutes.toString().padLeft(2, '0'), ValueKey<int>(minutes), theme),
+              _buildTimeSeparator(theme),
+              // 秒数
+              _buildTimeDigit(seconds.toString().padLeft(2, '0'), ValueKey<int>(seconds), theme),
+            ],
+          ),
+          const SizedBox(width: 16),
+          // 状态指示器
+          AnimatedBuilder(
+            animation: _glowController,
+            builder: (context, child) {
+              return Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withAlpha(
+                    ((0.5 + 0.5 * _glowAnimation.value) * 255).toInt(),
                   ),
-                ],
-              ),
-            );
-          },
-        ),
-      ],
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.colorScheme.primary.withAlpha(
+                        ((0.6 * _glowAnimation.value) * 255).toInt(),
+                      ),
+                      blurRadius: 12,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -650,31 +624,96 @@ class _WorkoutScreenState extends State<WorkoutScreen>
     });
   }
 
+  Widget _buildTimeDigit(String value, Key key, ThemeData theme) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      transitionBuilder: (child, animation) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, -0.3),
+            end: Offset.zero,
+          ).animate(animation),
+          child: FadeTransition(
+            opacity: animation,
+            child: child,
+          ),
+        );
+      },
+      child: Container(
+        key: key,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.primary.withAlpha(25),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          value,
+          style: theme.textTheme.displayLarge!.copyWith(
+            fontSize: 44,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 2,
+            color: theme.colorScheme.primary,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimeSeparator(ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: Text(
+        ':',
+        style: theme.textTheme.displayLarge!.copyWith(
+          fontSize: 40,
+          fontWeight: FontWeight.w300,
+          color: theme.colorScheme.primary.withAlpha(153),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSetsList(ThemeData theme) {
     if (_sets.isEmpty) {
       return Container(
-        padding: const EdgeInsets.symmetric(vertical: 60),
+        padding: const EdgeInsets.symmetric(vertical: 80),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.fitness_center_outlined,
-                size: 72,
-                color: theme.colorScheme.onSurfaceVariant.withOpacity(0.3),
+              Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      theme.colorScheme.primary.withAlpha(25),
+                      theme.colorScheme.primary.withAlpha(5),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.fitness_center_outlined,
+                  size: 48,
+                  color: theme.colorScheme.primary.withAlpha(102),
+                ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               Text(
                 '点击右下角按钮添加训练动作',
                 style: theme.textTheme.bodyLarge!.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+                  color: theme.colorScheme.onSurfaceVariant.withAlpha(178),
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 '开始你的训练吧',
                 style: theme.textTheme.bodyMedium!.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant.withOpacity(0.4),
+                  color: theme.colorScheme.onSurfaceVariant.withAlpha(127),
                 ),
               ),
             ],
@@ -690,28 +729,37 @@ class _WorkoutScreenState extends State<WorkoutScreen>
       itemCount: _sets.length,
       itemBuilder: (context, index) {
         final set = _sets[index];
-        final isTemplateSet = set.weight == 0 && set.reps == 0;
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
+        final isTemplateSet = set.isTemplate;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutCubic,
+          margin: const EdgeInsets.only(bottom: 14),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
+            gradient: LinearGradient(
+              colors: [
+                theme.colorScheme.surface,
+                theme.colorScheme.surface.withAlpha(242),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
+                color: Colors.black.withAlpha(51),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 2,
+                color: Colors.black.withAlpha(12),
+                blurRadius: 4,
                 offset: const Offset(0, 1),
               ),
             ],
             border: Border.all(
               color: isTemplateSet
-                  ? theme.colorScheme.primary.withOpacity(0.2)
-                  : theme.colorScheme.outline.withOpacity(0.08),
+                  ? theme.colorScheme.primary.withAlpha(76)
+                  : theme.colorScheme.outline.withAlpha(38),
               width: 1,
             ),
           ),
@@ -727,13 +775,32 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                     children: [
                       // 序号
                       Container(
-                        width: 36,
-                        height: 36,
+                        width: 40,
+                        height: 40,
                         decoration: BoxDecoration(
-                          color: isTemplateSet
-                              ? theme.colorScheme.primary.withOpacity(0.2)
-                              : theme.colorScheme.primary,
+                          gradient: LinearGradient(
+                            colors: isTemplateSet
+                                ? [
+                                    theme.colorScheme.primary.withAlpha(51),
+                                    theme.colorScheme.primary.withAlpha(25),
+                                  ]
+                                : [
+                                    theme.colorScheme.primary,
+                                    theme.colorScheme.primary.withAlpha(216),
+                                  ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
                           shape: BoxShape.circle,
+                          boxShadow: isTemplateSet
+                              ? null
+                              : [
+                                  BoxShadow(
+                                    color: theme.colorScheme.primary.withAlpha(76),
+                                    blurRadius: 10,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
                         ),
                         child: Center(
                           child: Text(
@@ -743,6 +810,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                                   ? theme.colorScheme.primary
                                   : theme.colorScheme.onPrimary,
                               fontWeight: FontWeight.bold,
+                              fontSize: 14,
                             ),
                           ),
                         ),
@@ -767,7 +835,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                                       vertical: 2,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: theme.colorScheme.primary.withOpacity(0.1),
+                                      color: theme.colorScheme.primary.withAlpha(25),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
@@ -797,7 +865,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                             child: Icon(
                               Icons.delete_outline,
                               size: 22,
-                              color: theme.colorScheme.error.withOpacity(0.6),
+                              color: theme.colorScheme.error.withAlpha(153),
                             ),
                           ),
                         ),
@@ -844,7 +912,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
         color: theme.colorScheme.surface,
         border: Border(
           top: BorderSide(
-            color: theme.colorScheme.outline.withOpacity(0.1),
+            color: theme.colorScheme.outline.withAlpha(25),
             width: 1,
           ),
         ),
@@ -872,7 +940,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant,
+                color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Text(
@@ -889,9 +957,9 @@ class _WorkoutScreenState extends State<WorkoutScreen>
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
             activeTrackColor: theme.colorScheme.primary,
-            inactiveTrackColor: theme.colorScheme.surfaceVariant,
+            inactiveTrackColor: theme.colorScheme.surfaceContainerHighest,
             thumbColor: theme.colorScheme.primary,
-            overlayColor: theme.colorScheme.primary.withOpacity(0.15),
+            overlayColor: theme.colorScheme.primary.withAlpha(38),
             trackHeight: 6,
             thumbShape: const RoundSliderThumbShape(
               enabledThumbRadius: 14,
@@ -924,13 +992,13 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                   Icon(
                     Icons.sentiment_satisfied_outlined,
                     size: 14,
-                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+                    color: theme.colorScheme.onSurfaceVariant.withAlpha(153),
                   ),
                   const SizedBox(width: 4),
                   Text(
                     '轻松',
                     style: theme.textTheme.labelSmall!.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+                      color: theme.colorScheme.onSurfaceVariant.withAlpha(153),
                     ),
                   ),
                 ],
@@ -940,14 +1008,14 @@ class _WorkoutScreenState extends State<WorkoutScreen>
                   Text(
                     '力竭',
                     style: theme.textTheme.labelSmall!.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+                      color: theme.colorScheme.onSurfaceVariant.withAlpha(153),
                     ),
                   ),
                   const SizedBox(width: 4),
                   Icon(
                     Icons.sentiment_very_dissatisfied_outlined,
                     size: 14,
-                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+                    color: theme.colorScheme.onSurfaceVariant.withAlpha(153),
                   ),
                 ],
               ),
@@ -992,12 +1060,19 @@ class _WorkoutScreenState extends State<WorkoutScreen>
       }
     }
 
+    // 检查是否所有动作都是未编辑的模板动作
+    final allTemplateUnedited = _sets.every((s) => s.isTemplate && s.weight == 0 && s.reps == 0);
+    if (allTemplateUnedited) {
+      _showEmptyWorkoutConfirmDialog();
+      return;
+    }
+
     _timer?.cancel();
     _saveTimer?.cancel();
     final elapsed = _isTimerRunning
         ? DateTime.now().difference(_startTime)
         : const Duration(seconds: 0);
-    final finalDurationMinutes = elapsed.inMinutes;
+    final finalDurationMinutes = elapsed.inMinutes < 1 ? 1 : elapsed.inMinutes;
 
     // 从动作中推断训练部位
     final bodyParts = _sets.map((s) => s.exerciseTag).toSet().toList();
@@ -1153,7 +1228,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
     final elapsed = _isTimerRunning
         ? DateTime.now().difference(_startTime)
         : const Duration(seconds: 0);
-    final finalDurationMinutes = elapsed.inMinutes;
+    final finalDurationMinutes = elapsed.inMinutes < 1 ? 1 : elapsed.inMinutes;
 
     final record = WorkoutRecord(
       dateTime: _startTime,
@@ -1273,7 +1348,7 @@ class _AddSetBottomSheetState extends State<_AddSetBottomSheet> {
                       });
                     },
                     selectedColor: theme.colorScheme.primary,
-                    backgroundColor: theme.colorScheme.surfaceVariant,
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
                     labelStyle: TextStyle(
                       color: isSelected
                           ? theme.colorScheme.onPrimary
@@ -1289,7 +1364,7 @@ class _AddSetBottomSheetState extends State<_AddSetBottomSheet> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceVariant,
+              color: theme.colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(16),
             ),
             child: DropdownButtonHideUnderline(
@@ -1300,7 +1375,7 @@ class _AddSetBottomSheetState extends State<_AddSetBottomSheet> {
                   style: theme.textTheme.bodyMedium!,
                 ),
                 isExpanded: true,
-                dropdownColor: theme.colorScheme.surfaceVariant,
+                dropdownColor: theme.colorScheme.surfaceContainerHighest,
                 style: theme.textTheme.bodyMedium!,
                 items: _filteredExercises.map((exercise) {
                   return DropdownMenuItem(
@@ -1325,7 +1400,7 @@ class _AddSetBottomSheetState extends State<_AddSetBottomSheet> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceVariant,
+                    color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: TextField(
@@ -1349,7 +1424,7 @@ class _AddSetBottomSheetState extends State<_AddSetBottomSheet> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceVariant,
+                    color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: TextField(
@@ -1373,19 +1448,19 @@ class _AddSetBottomSheetState extends State<_AddSetBottomSheet> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceVariant,
+                    color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: TextField(
-                    controller: _repsController,
+                    controller: _setsController,
                     keyboardType: TextInputType.number,
                     style: theme.textTheme.bodyMedium!,
                     decoration: InputDecoration(
-                      hintText: '次数',
+                      hintText: '组数',
                       hintStyle: theme.textTheme.bodyMedium!.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
-                      suffixText: '次',
+                      suffixText: '组',
                       suffixStyle: theme.textTheme.bodySmall!,
                       border: InputBorder.none,
                     ),
@@ -1499,8 +1574,19 @@ class _EditSetBottomSheetState extends State<_EditSetBottomSheet> {
   @override
   void initState() {
     super.initState();
-    _weightController = TextEditingController();
-    _repsController = TextEditingController();
+    _weightController = TextEditingController(
+      text: widget.set.weight > 0 ? widget.set.weight.toString() : '',
+    );
+    _repsController = TextEditingController(
+      text: widget.set.reps > 0 ? widget.set.reps.toString() : '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _weightController.dispose();
+    _repsController.dispose();
+    super.dispose();
   }
 
   @override
@@ -1544,7 +1630,7 @@ class _EditSetBottomSheetState extends State<_EditSetBottomSheet> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceVariant,
+                    color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: TextField(
@@ -1568,7 +1654,7 @@ class _EditSetBottomSheetState extends State<_EditSetBottomSheet> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceVariant,
+                    color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: TextField(
@@ -1645,10 +1731,4 @@ class _EditSetBottomSheetState extends State<_EditSetBottomSheet> {
     );
   }
 
-  @override
-  void dispose() {
-    _weightController.dispose();
-    _repsController.dispose();
-    super.dispose();
-  }
 }

@@ -23,6 +23,11 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
 
   Future<void> _loadData() async {
     final data = await DatabaseHelper.instance.getBodyData();
+    data.sort((a, b) {
+      final dateA = DateTime.parse(a['recordDate'] as String);
+      final dateB = DateTime.parse(b['recordDate'] as String);
+      return dateB.compareTo(dateA);
+    });
     setState(() {
       _bodyData = data;
       _isLoading = false;
@@ -58,7 +63,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text(
                             '历史记录',
                             style: TextStyle(
                                 fontSize: 22, fontWeight: FontWeight.w600),
@@ -86,7 +91,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                                       Icons.monitor_weight_outlined,
                                       size: 72,
                                       color: theme.colorScheme.onSurfaceVariant
-                                          .withOpacity(0.5),
+                                          .withAlpha(127),
                                     ),
                                     const SizedBox(height: 20),
                                     Text(
@@ -135,7 +140,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       '最新数据',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600),
@@ -225,7 +230,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
             children: [
               Text(
                 value,
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 22, fontWeight: FontWeight.w600),
               ),
               const SizedBox(width: 2),
@@ -260,7 +265,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
               const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           title: Text(
             date,
-            style: TextStyle(fontSize: 14),
+            style: const TextStyle(fontSize: 14),
           ),
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 8),
@@ -281,7 +286,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
           trailing: IconButton(
             icon: Icon(
               Icons.delete_outline,
-              color: theme.colorScheme.error.withOpacity(0.7),
+              color: theme.colorScheme.error.withAlpha(178),
             ),
             onPressed: () => _deleteItem(data['id'] as int),
           ),
@@ -294,12 +299,12 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceVariant,
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         text,
-        style: TextStyle(fontSize: 11),
+        style: const TextStyle(fontSize: 11),
       ),
     );
   }
@@ -345,7 +350,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              Text(
+              const Text(
                 '记录身体数据',
                 style: TextStyle(fontSize: 22),
               ),
@@ -433,7 +438,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceVariant,
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(20),
       ),
       child: TextField(
@@ -441,7 +446,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
         keyboardType: keyboardType,
         readOnly: readOnly,
         onTap: onTap,
-        style: TextStyle(fontSize: 14),
+        style: const TextStyle(fontSize: 14),
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(

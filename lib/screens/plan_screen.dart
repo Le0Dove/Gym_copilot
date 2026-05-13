@@ -52,8 +52,13 @@ class _PlanScreenState extends State<PlanScreen> {
     return List.generate(7, (index) {
       final day = startOfWeek.add(Duration(days: index));
       final dayStr = DateFormat('yyyy-MM-dd').format(day);
-      return _records
-          .any((r) => DateFormat('yyyy-MM-dd').format(r.dateTime) == dayStr);
+      return _records.any((r) {
+        final recordDateStr = DateFormat('yyyy-MM-dd').format(r.dateTime);
+        final isInPlanRange = _activePlan == null ||
+            (!r.dateTime.isBefore(_activePlan!.startDate) &&
+                !r.dateTime.isAfter(_activePlan!.endDate));
+        return recordDateStr == dayStr && isInPlanRange;
+      });
     });
   }
 
@@ -109,12 +114,12 @@ class _PlanScreenState extends State<PlanScreen> {
                     children: [
                       Text(
                         _activePlan!.name,
-                        style: TextStyle(fontSize: 22),
+                        style: const TextStyle(fontSize: 22),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         '${DateFormat('yyyy.MM.dd').format(_activePlan!.startDate)} - ${DateFormat('yyyy.MM.dd').format(_activePlan!.endDate)}',
-                        style: TextStyle(fontSize: 12),
+                        style: const TextStyle(fontSize: 12),
                       ),
                     ],
                   ),
@@ -122,7 +127,7 @@ class _PlanScreenState extends State<PlanScreen> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceVariant,
+                      color: theme.colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -145,7 +150,7 @@ class _PlanScreenState extends State<PlanScreen> {
                       child: CircularProgressIndicator(
                         value: _planProgress,
                         strokeWidth: 8,
-                        backgroundColor: theme.colorScheme.surfaceVariant,
+                        backgroundColor: theme.colorScheme.surfaceContainerHighest,
                         valueColor: AlwaysStoppedAnimation<Color>(
                           theme.colorScheme.primary,
                         ),
@@ -156,10 +161,10 @@ class _PlanScreenState extends State<PlanScreen> {
                       children: [
                         Text(
                           '$percentage%',
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 28, fontWeight: FontWeight.w300),
                         ),
-                        Text(
+                        const Text(
                           '已完成',
                           style: TextStyle(fontSize: 11),
                         ),
@@ -198,13 +203,13 @@ class _PlanScreenState extends State<PlanScreen> {
       children: [
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
               fontSize: 16, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(fontSize: 11),
+          style: const TextStyle(fontSize: 11),
         ),
       ],
     );
@@ -213,6 +218,8 @@ class _PlanScreenState extends State<PlanScreen> {
   Widget _buildWeekCalendar(ThemeData theme) {
     final weekDays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
     final completion = _weekCompletion;
+    final now = DateTime.now();
+    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
 
     return FadeInUp(
       child: Card(
@@ -221,7 +228,7 @@ class _PlanScreenState extends State<PlanScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 '本周训练计划',
                 style: TextStyle(fontSize: 22),
               ),
@@ -230,6 +237,7 @@ class _PlanScreenState extends State<PlanScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: List.generate(7, (index) {
                   final isCompleted = completion[index];
+                  final dayDate = startOfWeek.add(Duration(days: index));
                   return Column(
                     children: [
                       Container(
@@ -238,7 +246,7 @@ class _PlanScreenState extends State<PlanScreen> {
                         decoration: BoxDecoration(
                           color: isCompleted
                               ? theme.colorScheme.primary
-                              : theme.colorScheme.surfaceVariant,
+                              : theme.colorScheme.surfaceContainerHighest,
                           shape: BoxShape.circle,
                         ),
                         child: Center(
@@ -246,7 +254,7 @@ class _PlanScreenState extends State<PlanScreen> {
                               ? Icon(Icons.check,
                                   color: theme.colorScheme.onPrimary, size: 18)
                               : Text(
-                                  '${index + 1}',
+                                  '${dayDate.day}',
                                   style: TextStyle(
                                       fontSize: 12,
                                       color:
@@ -303,7 +311,7 @@ class _PlanScreenState extends State<PlanScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           '所有周期',
           style: TextStyle(
               fontSize: 22, fontWeight: FontWeight.w600),
@@ -334,10 +342,10 @@ class _PlanScreenState extends State<PlanScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.surfaceVariant,
+                              color: theme.colorScheme.surfaceContainerHighest,
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: Text(
+                            child: const Text(
                               '进行中',
                               style: TextStyle(fontSize: 11),
                             ),
@@ -347,12 +355,12 @@ class _PlanScreenState extends State<PlanScreen> {
                     const SizedBox(height: 8),
                     Text(
                       '${DateFormat('yyyy.MM.dd').format(plan.startDate)} - ${DateFormat('yyyy.MM.dd').format(plan.endDate)}',
-                      style: TextStyle(fontSize: 12),
+                      style: const TextStyle(fontSize: 12),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '每周${plan.daysPerWeek}练 · ${plan.workoutDays}',
-                      style: TextStyle(fontSize: 12),
+                      style: const TextStyle(fontSize: 12),
                     ),
                     const SizedBox(height: 12),
                     Row(
@@ -362,7 +370,7 @@ class _PlanScreenState extends State<PlanScreen> {
                             borderRadius: BorderRadius.circular(20),
                             child: LinearProgressIndicator(
                               value: _calculateProgress(plan),
-                              backgroundColor: theme.colorScheme.surfaceVariant,
+                              backgroundColor: theme.colorScheme.surfaceContainerHighest,
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 theme.colorScheme.primary,
                               ),
@@ -373,7 +381,7 @@ class _PlanScreenState extends State<PlanScreen> {
                         const SizedBox(width: 12),
                         Text(
                           '${(_calculateProgress(plan) * 100).toStringAsFixed(0)}%',
-                          style: TextStyle(fontSize: 12),
+                          style: const TextStyle(fontSize: 12),
                         ),
                       ],
                     ),
@@ -388,7 +396,7 @@ class _PlanScreenState extends State<PlanScreen> {
                           minimumSize: Size.zero,
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
-                        child: Text(
+                        child: const Text(
                           '删除',
                           style: TextStyle(fontSize: 11),
                         ),
@@ -436,149 +444,4 @@ class _PlanScreenState extends State<PlanScreen> {
     }
   }
 
-  Future<void> _showAddPlanDialog() async {
-    final nameController = TextEditingController();
-    final daysController = TextEditingController();
-    DateTime? startDate;
-    DateTime? endDate;
-    final List<String> selectedDays = [];
-    final List<String> weekDays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-
-    final result = await showDialog<WorkoutPlan?>(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text('新建健身周期'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(
-                    labelText: '周期名称',
-                    hintText: '例如：减脂期、增肌期',
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: daysController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: '每周训练天数',
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ListTile(
-                  title: const Text('开始日期'),
-                  subtitle: Text(startDate != null
-                      ? DateFormat('yyyy-MM-dd').format(startDate!)
-                      : '请选择'),
-                  trailing: const Icon(Icons.calendar_today),
-                  onTap: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime(2030),
-                    );
-                    if (picked != null) {
-                      setState(() {
-                        startDate = picked;
-                      });
-                    }
-                  },
-                ),
-                ListTile(
-                  title: const Text('结束日期'),
-                  subtitle: Text(endDate != null
-                      ? DateFormat('yyyy-MM-dd').format(endDate!)
-                      : '请选择'),
-                  trailing: const Icon(Icons.calendar_today),
-                  onTap: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now().add(const Duration(days: 30)),
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime(2030),
-                    );
-                    if (picked != null) {
-                      setState(() {
-                        endDate = picked;
-                      });
-                    }
-                  },
-                ),
-                const SizedBox(height: 16),
-                const Text('训练日安排:'),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  children: weekDays.map((day) {
-                    final isSelected = selectedDays.contains(day);
-                    return FilterChip(
-                      label: Text(day),
-                      selected: isSelected,
-                      onSelected: (_) {
-                        setState(() {
-                          if (isSelected) {
-                            selectedDays.remove(day);
-                          } else {
-                            selectedDays.add(day);
-                          }
-                        });
-                      },
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('取消'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (nameController.text.isEmpty ||
-                    daysController.text.isEmpty ||
-                    startDate == null ||
-                    endDate == null ||
-                    selectedDays.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('请填写完整信息')),
-                  );
-                  return;
-                }
-
-                final days = int.tryParse(daysController.text);
-                if (days == null || days <= 0 || days > 7) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('请输入有效的训练天数(1-7)')),
-                  );
-                  return;
-                }
-
-                final plan = WorkoutPlan(
-                  name: nameController.text,
-                  startDate: startDate!,
-                  endDate: endDate!,
-                  daysPerWeek: days,
-                  workoutDays: selectedDays.join(', '),
-                );
-                Navigator.pop(context, plan);
-              },
-              child: const Text('创建'),
-            ),
-          ],
-        ),
-      ),
-    );
-
-    if (result != null) {
-      await DatabaseHelper.instance.insertWorkoutPlan(result);
-      _loadData();
-    }
-  }
 }

@@ -58,6 +58,7 @@ class _StatsScreenState extends State<StatsScreen> {
       final key = DateFormat('MM/dd').format(day);
       durationData[key] = 0;
       hasRecordData[key] = false;
+
     }
     for (var record in _records) {
       final key = DateFormat('MM/dd').format(record.dateTime);
@@ -67,6 +68,47 @@ class _StatsScreenState extends State<StatsScreen> {
       }
     }
     return durationData.entries.toList();
+  }
+
+  /// 计算每次训练的总容量 (weight × reps)
+  double _calcRecordVolume(WorkoutRecord record) {
+    return record.exerciseSets.fold<double>(
+      0,
+      (sum, set) => sum + set.weight * set.reps,
+    );
+  }
+
+  List<MapEntry<String, double>> get _weeklyVolumeData {
+    final Map<String, double> volumeData = {};
+    final now = DateTime.now();
+    for (int i = 6; i >= 0; i--) {
+      final day = now.subtract(Duration(days: i));
+      final key = DateFormat('MM/dd').format(day);
+      volumeData[key] = 0;
+    }
+    for (var record in _records) {
+      final key = DateFormat('MM/dd').format(record.dateTime);
+      if (volumeData.containsKey(key)) {
+        volumeData[key] = volumeData[key]! + _calcRecordVolume(record);
+      }
+    }
+    return volumeData.entries.toList();
+  }
+
+  double get _weeklyTotalVolume {
+    return _weeklyVolumeData.fold(0, (sum, e) => sum + e.value);
+  }
+
+  double get _weeklyAvgVolume {
+    final nonZero = _weeklyVolumeData.where((e) => e.value > 0).toList();
+    if (nonZero.isEmpty) return 0;
+    return nonZero.map((e) => e.value).reduce((a, b) => a + b) / nonZero.length;
+  }
+
+  double get _weeklyMaxVolume {
+    final data = _weeklyVolumeData;
+    if (data.isEmpty) return 0;
+    return data.map((e) => e.value).reduce((a, b) => a > b ? a : b);
   }
 
   Map<String, int> get _bodyPartDistribution {
@@ -79,12 +121,15 @@ class _StatsScreenState extends State<StatsScreen> {
 
   List<MapEntry<String, double>> get _fatigueTrend {
     final Map<String, List<int>> data = {};
+    final Map<String, DateTime> dateMap = {};
     for (var record in _records) {
       final key = DateFormat('MM/dd').format(record.dateTime);
       data.putIfAbsent(key, () => []).add(record.fatigueLevel);
+      dateMap[key] = record.dateTime;
     }
-    final sortedKeys = data.keys.toList()..sort();
-    return sortedKeys.take(7).map((key) {
+    final sortedKeys = data.keys.toList()
+      ..sort((a, b) => dateMap[a]!.compareTo(dateMap[b]!));
+    return sortedKeys.reversed.take(7).toList().reversed.map((key) {
       final values = data[key]!;
       final avg = values.reduce((a, b) => a + b) / values.length;
       return MapEntry(key, avg);
@@ -99,7 +144,7 @@ class _StatsScreenState extends State<StatsScreen> {
         backgroundColor: _backgroundColor,
         elevation: 0,
         centerTitle: true,
-        title: Text(
+        title: const Text(
           '数据统计',
           style: TextStyle(
             fontSize: 24,
@@ -125,11 +170,25 @@ class _StatsScreenState extends State<StatsScreen> {
                   children: [
                     FadeInUp(
                       duration: const Duration(milliseconds: 400),
+                      child: _buildVolumeSummaryCard(),
+                    ),
+                    const SizedBox(height: 24),
+                    FadeInUp(
+                      duration: const Duration(milliseconds: 400),
                       child: _buildSectionTitle('近7天训练时长'),
                     ),
                     FadeInUp(
                       duration: const Duration(milliseconds: 500),
                       child: _buildWeeklyChart(),
+                    ),
+                    const SizedBox(height: 32),
+                    FadeInUp(
+                      duration: const Duration(milliseconds: 400),
+                      child: _buildSectionTitle('近7天训练容量'),
+                    ),
+                    FadeInUp(
+                      duration: const Duration(milliseconds: 500),
+                      child: _buildVolumeChart(),
                     ),
                     const SizedBox(height: 32),
                     FadeInUp(
@@ -162,10 +221,266 @@ class _StatsScreenState extends State<StatsScreen> {
       padding: const EdgeInsets.only(bottom: 16),
       child: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: _textColor,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVolumeSummaryCard() {
+    final volume = _weeklyTotalVolume;
+    final avg = _weeklyAvgVolume;
+    final max = _weeklyMaxVolume;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            _primaryColor.withAlpha(38),
+            _primaryColor.withAlpha(7),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: _primaryColor.withAlpha(51),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [_primaryColor, _primaryColor.withAlpha(178)],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.bar_chart_rounded, color: Colors.white, size: 20),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                '本周训练容量',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: _textColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: _buildSummaryStat(
+                  volume.toStringAsFixed(0),
+                  '总容量 kg·次',
+                  _primaryColor,
+                ),
+              ),
+              Container(
+                width: 1,
+                height: 48,
+                color: _borderColor.withAlpha(127),
+                margin: const EdgeInsets.symmetric(horizontal: 12),
+              ),
+              Expanded(
+                child: _buildSummaryStat(
+                  avg.toStringAsFixed(0),
+                  '平均每次',
+                  _accentColor,
+                ),
+              ),
+              Container(
+                width: 1,
+                height: 48,
+                color: _borderColor.withAlpha(127),
+                margin: const EdgeInsets.symmetric(horizontal: 12),
+              ),
+              Expanded(
+                child: _buildSummaryStat(
+                  max.toStringAsFixed(0),
+                  '单日最高',
+                  const Color(0xFF4FC3F7),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryStat(String value, String label, Color color) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: color,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 10,
+            color: _mutedColor,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildVolumeChart() {
+    final data = _weeklyVolumeData;
+    if (data.every((e) => e.value == 0)) {
+      return _buildEmptyChart('近7天暂无训练数据');
+    }
+
+    final maxValue = data.map((e) => e.value).reduce((a, b) => a > b ? a : b);
+    final maxY = (maxValue < 50 ? 50.0 : maxValue * 1.2);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: _cardColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: _borderColor, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(38),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 20, 20, 8),
+        child: Column(
+          children: [
+            SizedBox(
+              height: 200,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  maxY: maxY,
+                  barTouchData: BarTouchData(
+                    enabled: true,
+                    touchTooltipData: BarTouchTooltipData(
+                      getTooltipColor: (spot) => _surfaceVariant,
+                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        return BarTooltipItem(
+                          '${rod.toY.toStringAsFixed(0)} kg·次',
+                          const TextStyle(
+                            color: _textColor,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 32,
+                        getTitlesWidget: (value, meta) {
+                          final index = value.toInt();
+                          if (index < 0 || index >= data.length) {
+                            return const SizedBox.shrink();
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Text(
+                              data[index].key.substring(5),
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: _mutedColor,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 44,
+                        interval: maxY / 4,
+                        getTitlesWidget: (value, meta) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 4),
+                            child: Text(
+                              '${value.toInt()}',
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: _mutedColor,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                  ),
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    horizontalInterval: maxY / 4,
+                    getDrawingHorizontalLine: (value) => FlLine(
+                      color: _borderColor.withAlpha(38),
+                      strokeWidth: 1,
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  barGroups: data.asMap().entries.map((e) {
+                    return BarChartGroupData(
+                      x: e.key,
+                      barRods: [
+                        BarChartRodData(
+                          toY: e.value.value,
+                          gradient: LinearGradient(
+                            colors: [
+                              _primaryColor,
+                              _primaryColor.withAlpha(153),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                          width: 22,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(6),
+                            topRight: Radius.circular(6),
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -199,7 +514,7 @@ class _StatsScreenState extends State<StatsScreen> {
                 drawVerticalLine: false,
                 horizontalInterval: interval,
                 getDrawingHorizontalLine: (value) => FlLine(
-                  color: _borderColor.withOpacity(0.3),
+                  color: _borderColor.withAlpha(76),
                   strokeWidth: 1,
                 ),
               ),
@@ -215,7 +530,7 @@ class _StatsScreenState extends State<StatsScreen> {
                       }
                       return Text(
                         '${value.toInt()}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 12,
                           color: _mutedColor,
                         ),
@@ -236,7 +551,7 @@ class _StatsScreenState extends State<StatsScreen> {
                         padding: const EdgeInsets.only(top: 8),
                         child: Text(
                           data[index].key,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             color: _mutedColor,
                           ),
@@ -278,7 +593,7 @@ class _StatsScreenState extends State<StatsScreen> {
                   ),
                   belowBarData: BarAreaData(
                     show: true,
-                    color: _primaryColor.withOpacity(0.05),
+                    color: _primaryColor.withAlpha(12),
                   ),
                 ),
               ],
@@ -294,8 +609,6 @@ class _StatsScreenState extends State<StatsScreen> {
     if (data.isEmpty) {
       return _buildEmptyChart('暂无部位分布数据');
     }
-
-    final colorKeys = data.keys.toList();
 
     final total = data.values.reduce((a, b) => a + b);
 
@@ -325,7 +638,7 @@ class _StatsScreenState extends State<StatsScreen> {
                       value: entry.value.toDouble(),
                       title: '$percentage%',
                       radius: 50,
-                      titleStyle: TextStyle(
+                      titleStyle: const TextStyle(
                         fontSize: 12,
                         color: _textColor,
                         fontWeight: FontWeight.w600,
@@ -356,7 +669,7 @@ class _StatsScreenState extends State<StatsScreen> {
                     const SizedBox(width: 6),
                     Text(
                       '${ExerciseData.getTagDisplayName(entry.key)} (${entry.value}次)',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                         color: _textColor,
                       ),
@@ -394,7 +707,7 @@ class _StatsScreenState extends State<StatsScreen> {
                 drawVerticalLine: false,
                 horizontalInterval: 2,
                 getDrawingHorizontalLine: (value) => FlLine(
-                  color: _borderColor.withOpacity(0.3),
+                  color: _borderColor.withAlpha(76),
                   strokeWidth: 1,
                 ),
               ),
@@ -406,7 +719,7 @@ class _StatsScreenState extends State<StatsScreen> {
                     interval: 2,
                     getTitlesWidget: (value, meta) => Text(
                       '${value.toInt()}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         color: _mutedColor,
                       ),
@@ -426,7 +739,7 @@ class _StatsScreenState extends State<StatsScreen> {
                         padding: const EdgeInsets.only(top: 8),
                         child: Text(
                           data[index].key,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             color: _mutedColor,
                           ),
@@ -468,7 +781,7 @@ class _StatsScreenState extends State<StatsScreen> {
                   ),
                   belowBarData: BarAreaData(
                     show: true,
-                    color: _accentColor.withOpacity(0.05),
+                    color: _accentColor.withAlpha(12),
                   ),
                 ),
               ],
@@ -491,7 +804,7 @@ class _StatsScreenState extends State<StatsScreen> {
         child: Center(
           child: Text(
             message,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               color: _mutedColor,
             ),

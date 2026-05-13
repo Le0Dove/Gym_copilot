@@ -135,7 +135,7 @@ class _WorkoutTemplatesScreenState extends State<WorkoutTemplatesScreen> {
 
     return Card(
       elevation: 2,
-      shadowColor: theme.colorScheme.shadow.withOpacity(0.3),
+      shadowColor: theme.colorScheme.shadow.withAlpha(76),
       clipBehavior: Clip.antiAlias,
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
@@ -153,7 +153,7 @@ class _WorkoutTemplatesScreenState extends State<WorkoutTemplatesScreen> {
                   Expanded(
                     child: Text(
                       name,
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600),
                     ),
                   ),
@@ -169,7 +169,7 @@ class _WorkoutTemplatesScreenState extends State<WorkoutTemplatesScreen> {
               const SizedBox(height: 4),
               Text(
                 '部位: $bodyPart',
-                style: TextStyle(fontSize: 12),
+                style: const TextStyle(fontSize: 12),
               ),
               const SizedBox(height: 8),
               // 显示动作详情（包含重量、次数、组数）
@@ -186,7 +186,7 @@ class _WorkoutTemplatesScreenState extends State<WorkoutTemplatesScreen> {
                         Expanded(
                           child: Text(
                             exercise['exerciseName'] as String,
-                            style: TextStyle(fontSize: 12),
+                            style: const TextStyle(fontSize: 12),
                           ),
                         ),
                         Text(
@@ -332,7 +332,7 @@ class _CreateTemplateBottomSheetState
             ),
           ),
           const SizedBox(height: 16),
-          Text(
+          const Text(
             '新建训练模板',
             style: TextStyle(fontSize: 16),
           ),
@@ -341,12 +341,12 @@ class _CreateTemplateBottomSheetState
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceVariant,
+              color: theme.colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(20),
             ),
             child: TextField(
               controller: _nameController,
-              style: TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 14),
               decoration: InputDecoration(
                 hintText: '模板名称',
                 hintStyle: TextStyle(
@@ -358,7 +358,7 @@ class _CreateTemplateBottomSheetState
           ),
           const SizedBox(height: 16),
           // 训练部位选择
-          Text('选择训练部位', style: TextStyle(fontSize: 14)),
+          const Text('选择训练部位', style: TextStyle(fontSize: 14)),
           const SizedBox(height: 10),
           Row(
             children: ExerciseData.getAllTags().map((tag) {
@@ -369,7 +369,7 @@ class _CreateTemplateBottomSheetState
                   child: Material(
                     color: isSelected
                         ? theme.colorScheme.primary
-                        : theme.colorScheme.surfaceVariant,
+                        : theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(20),
                     child: InkWell(
                       onTap: () {
@@ -402,7 +402,7 @@ class _CreateTemplateBottomSheetState
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('选择动作', style: TextStyle(fontSize: 14)),
+              const Text('选择动作', style: TextStyle(fontSize: 14)),
               if (_selectedBodyPart != null)
                 TextButton(
                   onPressed: () {
@@ -422,7 +422,7 @@ class _CreateTemplateBottomSheetState
                 ? Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceVariant,
+                      color: theme.colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Center(
@@ -436,7 +436,7 @@ class _CreateTemplateBottomSheetState
                   )
                 : Container(
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                      color: theme.colorScheme.surfaceContainerHighest.withAlpha(76),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: ListView.builder(
@@ -452,7 +452,7 @@ class _CreateTemplateBottomSheetState
                               horizontal: 16, vertical: 4),
                           title: Text(
                             exercise.name,
-                            style: TextStyle(fontSize: 14),
+                            style: const TextStyle(fontSize: 14),
                           ),
                           value: isSelected,
                           onChanged: (value) async {
@@ -493,10 +493,10 @@ class _CreateTemplateBottomSheetState
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceVariant,
+                        color: theme.colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: theme.colorScheme.primary.withOpacity(0.3),
+                          color: theme.colorScheme.primary.withAlpha(76),
                         ),
                       ),
                       child: Row(
@@ -504,7 +504,7 @@ class _CreateTemplateBottomSheetState
                         children: [
                           Text(
                             config.exercise.name,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontSize: 12, fontWeight: FontWeight.w500),
                           ),
                           const SizedBox(width: 4),
@@ -611,7 +611,7 @@ class _CreateTemplateBottomSheetState
                 children: [
                   Text(
                     exercise.name,
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
@@ -728,7 +728,7 @@ class _CreateTemplateBottomSheetState
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceVariant,
+            color: theme.colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Row(
@@ -738,7 +738,7 @@ class _CreateTemplateBottomSheetState
                   controller: controller,
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontSize: 22, fontWeight: FontWeight.bold),
                   decoration: InputDecoration(
                     hintText: '0',
@@ -797,7 +797,7 @@ class _CreateTemplateBottomSheetState
                 children: [
                   Text(
                     '编辑 ${config.exercise.name}',
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
