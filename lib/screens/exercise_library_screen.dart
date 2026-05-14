@@ -225,7 +225,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                 padding: const EdgeInsets.all(16),
                                 child: Row(
                                   children: [
-                                    // 左侧图标
+                                    // 左侧色块标识
                                     Container(
                                       width: 48,
                                       height: 48,
@@ -234,13 +234,6 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                             .withAlpha(38),
                                         borderRadius:
                                             BorderRadius.circular(16),
-                                      ),
-                                      child: Center(
-                                        child: Icon(
-                                          _getTagIcon(exercise.tag),
-                                          color: _getTagColor(exercise.tag),
-                                          size: 24,
-                                        ),
                                       ),
                                     ),
                                     const SizedBox(width: 16),
@@ -421,18 +414,6 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
     );
   }
 
-  IconData _getTagIcon(String tag) {
-    final icons = {
-      'chest': Icons.fitness_center,
-      'back': Icons.arrow_back,
-      'legs': Icons.directions_walk,
-      'shoulders': Icons.accessibility,
-      'arms': Icons.pan_tool,
-      'core': Icons.circle,
-    };
-    return icons[tag] ?? Icons.fitness_center;
-  }
-
   Color _getTagColor(String tag) {
     final colors = {
       'chest': const Color(0xFFFF8A65),
@@ -483,13 +464,6 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                       decoration: BoxDecoration(
                         color: _getTagColor(exercise.tag).withAlpha(38),
                         borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          _getTagIcon(exercise.tag),
-                          color: _getTagColor(exercise.tag),
-                          size: 24,
-                        ),
                       ),
                     ),
                     const SizedBox(width: 16),
