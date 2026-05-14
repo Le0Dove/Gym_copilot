@@ -178,7 +178,6 @@ class HomeScreenState extends State<HomeScreen>
           child: Row(
             children: [
               Expanded(
-                flex: 2,
                 child: FilledButton.icon(
                   onPressed: () async {
                     await Navigator.push(
@@ -194,12 +193,13 @@ class HomeScreenState extends State<HomeScreen>
                   label: const Text('开始训练'),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    backgroundColor: const Color(0xFFE8E4E1),
-                    foregroundColor: const Color(0xFF0A0A0A),
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    elevation: 0,
+                    elevation: 4,
+                    shadowColor: theme.colorScheme.primary.withAlpha(102),
                   ),
                 ),
               ),
@@ -219,7 +219,7 @@ class HomeScreenState extends State<HomeScreen>
                   label: const Text('模板'),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    foregroundColor: const Color(0xFF8B8680),
+                    foregroundColor: theme.colorScheme.onSurface,
                     side: const BorderSide(color: Color(0xFF2A3248)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),

@@ -282,53 +282,56 @@ class _WorkoutScreenState extends State<WorkoutScreen>
           icon: const Icon(Icons.arrow_back),
           onPressed: () => _showDiscardDialog(),
         ),
-        actions: [
-          if (!_isSaving)
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: ElevatedButton(
-                onPressed: _finishWorkout,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: theme.colorScheme.onPrimary,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 2,
-                ),
-                child: const Text(
-                  '完成',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            ),
-        ],
       ),
       body: _isRestoring
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Column(
-                children: [
-                  // 顶部固定区域：计时器 + 训练部位
-                  _buildHeaderSection(minutes, seconds, theme),
-
-                  // 中间可滚动区域：动作列表
-                  _buildSetsList(theme),
-
-                  // 底部固定区域：疲劳度（独占一行）
-                  _buildBottomSection(theme),
-                ],
-              ),
+          : Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        _buildHeaderSection(minutes, seconds, theme),
+                        _buildSetsList(theme),
+                        _buildBottomSection(theme),
+                      ],
+                    ),
+                  ),
+                ),
+                // 底部完成按钮
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: FilledButton.icon(
+                        onPressed: _isSaving ? null : _finishWorkout,
+                        icon: const Icon(Icons.check_circle_outline, size: 20),
+                        label: const Text('完成训练'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primary,
+                          foregroundColor: theme.colorScheme.onPrimary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          elevation: 4,
+                          shadowColor: theme.colorScheme.primary.withAlpha(102),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: _addExerciseSet,
         elevation: 6,
         highlightElevation: 12,
-        child: const Icon(Icons.add),
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
+        icon: const Icon(Icons.add),
+        label: const Text('添加动作'),
       ),
     );
   }

@@ -320,8 +320,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildSettingItem(
               icon: Icons.delete_outline,
               title: '删除所有记录',
-              subtitle: '清除所有训练数据、计划、模板及身体数据',
+              subtitle: '清除所有训练数据、模板及身体数据',
               onTap: _deleteAllRecords,
+              destructive: true,
             ),
             const Divider(height: 1, indent: 56, color: _borderColor),
             _buildSettingItem(
@@ -357,6 +358,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required String title,
     required String subtitle,
     required VoidCallback onTap,
+    bool destructive = false,
   }) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -364,21 +366,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: _surfaceVariant.withAlpha(153),
+          color: destructive ? _surfaceVariant.withAlpha(153) : _surfaceVariant.withAlpha(153),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(
           icon,
           size: 20,
-          color: _primaryColor,
+          color: destructive ? const Color(0xFFEF4444) : _primaryColor,
         ),
       ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w500,
-          color: _foregroundColor,
+          color: destructive ? const Color(0xFFEF4444) : _foregroundColor,
         ),
       ),
       subtitle: Text(
