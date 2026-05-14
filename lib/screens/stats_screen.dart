@@ -218,11 +218,11 @@ class _StatsScreenState extends State<StatsScreen> {
 
   Widget _buildSectionTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Text(
         title,
         style: const TextStyle(
-          fontSize: 20,
+          fontSize: 18,
           fontWeight: FontWeight.w600,
           color: _textColor,
         ),
@@ -236,19 +236,19 @@ class _StatsScreenState extends State<StatsScreen> {
     final max = _weeklyMaxVolume;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            _primaryColor.withAlpha(38),
-            _primaryColor.withAlpha(7),
+            _primaryColor.withAlpha(30),
+            _primaryColor.withAlpha(5),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: _primaryColor.withAlpha(51),
+          color: _primaryColor.withAlpha(38),
           width: 1,
         ),
       ),
@@ -258,28 +258,28 @@ class _StatsScreenState extends State<StatsScreen> {
           Row(
             children: [
               Container(
-                width: 40,
-                height: 40,
+                width: 36,
+                height: 36,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [_primaryColor, _primaryColor.withAlpha(178)],
                   ),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.bar_chart_rounded, color: Colors.white, size: 20),
+                child: const Icon(Icons.bar_chart_rounded, color: Colors.white, size: 18),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               const Text(
                 '本周训练容量',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 17,
                   fontWeight: FontWeight.w600,
                   color: _textColor,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
@@ -291,9 +291,9 @@ class _StatsScreenState extends State<StatsScreen> {
               ),
               Container(
                 width: 1,
-                height: 48,
-                color: _borderColor.withAlpha(127),
-                margin: const EdgeInsets.symmetric(horizontal: 12),
+                height: 44,
+                color: _borderColor.withAlpha(76),
+                margin: const EdgeInsets.symmetric(horizontal: 10),
               ),
               Expanded(
                 child: _buildSummaryStat(
@@ -304,9 +304,9 @@ class _StatsScreenState extends State<StatsScreen> {
               ),
               Container(
                 width: 1,
-                height: 48,
-                color: _borderColor.withAlpha(127),
-                margin: const EdgeInsets.symmetric(horizontal: 12),
+                height: 44,
+                color: _borderColor.withAlpha(76),
+                margin: const EdgeInsets.symmetric(horizontal: 10),
               ),
               Expanded(
                 child: _buildSummaryStat(
@@ -328,12 +328,12 @@ class _StatsScreenState extends State<StatsScreen> {
         Text(
           value,
           style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
             color: color,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2),
         Text(
           label,
           style: const TextStyle(
@@ -358,15 +358,8 @@ class _StatsScreenState extends State<StatsScreen> {
     return Container(
       decoration: BoxDecoration(
         color: _cardColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: _borderColor, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(38),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 20, 20, 8),
@@ -500,7 +493,7 @@ class _StatsScreenState extends State<StatsScreen> {
     return Container(
       decoration: BoxDecoration(
         color: _cardColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: _borderColor, width: 1),
       ),
       child: Padding(
@@ -615,7 +608,7 @@ class _StatsScreenState extends State<StatsScreen> {
     return Container(
       decoration: BoxDecoration(
         color: _cardColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: _borderColor, width: 1),
       ),
       child: Padding(
@@ -693,7 +686,7 @@ class _StatsScreenState extends State<StatsScreen> {
     return Container(
       decoration: BoxDecoration(
         color: _cardColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: _borderColor, width: 1),
       ),
       child: Padding(
@@ -796,7 +789,7 @@ class _StatsScreenState extends State<StatsScreen> {
     return Container(
       decoration: BoxDecoration(
         color: _cardColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: _borderColor, width: 1),
       ),
       child: SizedBox(

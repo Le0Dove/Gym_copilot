@@ -6,7 +6,6 @@ import 'package:path/path.dart';
 
 import '../models/exercise.dart';
 import '../models/workout_record.dart';
-import '../models/workout_plan.dart';
 import '../data/exercise_data.dart';
 
 class DatabaseHelper {
@@ -14,7 +13,6 @@ class DatabaseHelper {
   static Database? _database;
   static List<Exercise> _webExercises = [];
   static final List<WorkoutRecord> _webRecords = [];
-  static final List<WorkoutPlan> _webPlans = [];
   static int _webIdCounter = 1;
 
   DatabaseHelper._init();
@@ -540,121 +538,17 @@ class DatabaseHelper {
     );
   }
 
-  // 插入测试数据用于诊断
-  Future<void> insertTestData() async {
-    if (kIsWeb) return;
-    try {
-      final db = await database;
-      await db.transaction((txn) async {
-        // 插入测试记录
-        final recordId = await txn.insert('workout_records', {
-          'dateTime': DateTime.now().toIso8601String(),
-          'bodyPart': 'chest',
-          'durationMinutes': 30,
-          'fatigueLevel': 5,
-        });
-        debugPrint('测试记录插入成功，ID=$recordId');
 
-        // 插入测试动作组
-        await txn.insert('exercise_sets', {
-          'recordId': recordId,
-          'exerciseId': 1,
-          'exerciseName': '测试动作',
-          'exerciseTag': 'chest',
-          'weight': 20.0,
-          'reps': 10,
-          'setNumber': 1,
-        });
-        debugPrint('测试动作组插入成功');
-      });
-    } catch (e, stackTrace) {
-      debugPrint('插入测试数据失败: $e');
-      debugPrint('堆栈跟踪: $stackTrace');
-      rethrow;
-    }
-  }
-
-  // 获取数据库路径用于诊断
-  Future<String> getDatabasePath() async {
-    final dbPath = await getDatabasesPath();
-    return dbPath;
-  }
-
-  Future<int> insertWorkoutPlan(WorkoutPlan plan) async {
-    if (kIsWeb) {
-      plan.id = _webIdCounter++;
-      _webPlans.insert(0, plan);
-      return plan.id!;
-    }
-    final db = await database;
-    return await db.insert('workout_plans', plan.toMap());
-  }
-
-  Future<List<WorkoutPlan>> getWorkoutPlans() async {
-    if (kIsWeb) {
-      return _webPlans;
-    }
-    final db = await database;
-    final result = await db.query(
-      'workout_plans',
-      orderBy: 'startDate DESC',
-    );
-    return result.map((map) => WorkoutPlan.fromMap(map)).toList();
-  }
-
-  Future<WorkoutPlan?> getActiveWorkoutPlan() async {
-    if (kIsWeb) {
-      final now = DateTime.now();
-      for (var plan in _webPlans) {
-        if (plan.startDate.isBefore(now) && plan.endDate.isAfter(now)) {
-          return plan;
-        }
-      }
-      return null;
-    }
-    final db = await database;
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final result = await db.query(
-      'workout_plans',
-      where: 'startDate <= ? AND endDate >= ?',
-      whereArgs: [
-        today.toIso8601String(),
-        today.toIso8601String()
-      ],
-      orderBy: 'startDate DESC',
-      limit: 1,
-    );
-    if (result.isNotEmpty) {
-      return WorkoutPlan.fromMap(result.first);
-    }
-    return null;
-  }
-
-  Future<int> deleteWorkoutPlan(int id) async {
-    if (kIsWeb) {
-      _webPlans.removeWhere((p) => p.id == id);
-      return 1;
-    }
-    final db = await database;
-    return await db.delete(
-      'workout_plans',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
 
   Future<void> deleteAllRecords() async {
     if (kIsWeb) {
       _webRecords.clear();
-      _webPlans.clear();
       return;
     }
     final db = await database;
     await db.delete('exercise_usage');
     await db.delete('exercise_sets');
     await db.delete('workout_records');
-    await db.delete('workout_plans');
     await db.delete('workout_templates');
     await db.delete('workout_in_progress');
     await db.delete('user_body_data');
@@ -787,7 +681,6 @@ class DatabaseHelper {
     final records = await db.query('workout_records');
     final sets = await db.query('exercise_sets');
     final templates = await db.query('workout_templates');
-    final plans = await db.query('workout_plans');
     final bodyData = await db.query('user_body_data');
 
     return {
@@ -798,7 +691,6 @@ class DatabaseHelper {
       'workout_records': records,
       'exercise_sets': sets,
       'workout_templates': templates,
-      'workout_plans': plans,
       'user_body_data': bodyData,
     };
   }
@@ -815,7 +707,6 @@ class DatabaseHelper {
       await txn.delete('exercise_sets');
       await txn.delete('workout_records');
       await txn.delete('workout_templates');
-      await txn.delete('workout_plans');
       await txn.delete('user_body_data');
 
       // 导入自定义动作
@@ -855,14 +746,6 @@ class DatabaseHelper {
       if (templates != null) {
         for (var template in templates) {
           await txn.insert('workout_templates', template as Map<String, dynamic>);
-        }
-      }
-
-      // 导入训练计划
-      final plans = data['workout_plans'] as List<dynamic>?;
-      if (plans != null) {
-        for (var plan in plans) {
-          await txn.insert('workout_plans', plan as Map<String, dynamic>);
         }
       }
 

@@ -6,7 +6,6 @@ import 'package:animate_do/animate_do.dart';
 import '../database/database_helper.dart';
 import '../models/workout_record.dart';
 import '../data/exercise_data.dart';
-import '../services/update_service.dart';
 import 'personal_data_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -19,7 +18,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   List<WorkoutRecord> _records = [];
   bool _isLoading = true;
-  String _appVersion = '1.0.0';
 
   static const Color _bgColor = Color(0xFF0B0F19);
   static const Color _surfaceColor = Color(0xFF1A1F2E);
@@ -33,16 +31,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     _loadData();
-    _loadVersion();
-  }
-
-  Future<void> _loadVersion() async {
-    final version = await UpdateService.instance.currentVersion;
-    if (mounted) {
-      setState(() {
-        _appVersion = version;
-      });
-    }
   }
 
   Future<void> _loadData() async {
@@ -238,7 +226,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       decoration: BoxDecoration(
         color: _surfaceColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: _borderColor),
       ),
       child: ConstrainedBox(
@@ -295,7 +283,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Container(
         decoration: BoxDecoration(
           color: _surfaceColor,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: _borderColor),
         ),
         clipBehavior: Clip.antiAlias,
@@ -330,13 +318,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const Divider(height: 1, indent: 56, color: _borderColor),
             _buildSettingItem(
-              icon: Icons.system_update_outlined,
-              title: '检查更新',
-              subtitle: '检查是否有新版本可用',
-              onTap: _checkForUpdate,
-            ),
-            const Divider(height: 1, indent: 56, color: _borderColor),
-            _buildSettingItem(
               icon: Icons.delete_outline,
               title: '删除所有记录',
               subtitle: '清除所有训练数据、计划、模板及身体数据',
@@ -346,12 +327,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildSettingItem(
               icon: Icons.info_outline,
               title: '关于',
-              subtitle: 'Gym Copilot v$_appVersion',
+              subtitle: 'Gym Copilot v1.2.1',
               onTap: () {
                 showAboutDialog(
                   context: context,
                   applicationName: 'Gym Copilot',
-                  applicationVersion: _appVersion,
+                  applicationVersion: '1.2.1',
                   applicationIcon: const Icon(
                     Icons.fitness_center,
                     color: _primaryColor,
@@ -415,129 +396,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _checkForUpdate() async {
-    final service = UpdateService.instance;
-    if (!service.isSupported) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('当前平台不支持热更新'),
-            backgroundColor: _surfaceVariant,
-          ),
-        );
-      }
-      return;
-    }
-
-    await service.checkForUpdate();
-
-    if (!mounted) return;
-
-    switch (UpdateService.statusNotifier.value) {
-      case UpdateStatus.updateAvailable:
-        final confirmed = await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            backgroundColor: _surfaceColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-              side: const BorderSide(color: _borderColor),
-            ),
-            title: const Text(
-              '发现新版本',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: _foregroundColor,
-              ),
-            ),
-            content: const Text(
-              '检测到可用的更新补丁，是否立即下载？',
-              style: TextStyle(color: _foregroundColor),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(
-                  '稍后',
-                  style: TextStyle(color: _mutedColor),
-                ),
-              ),
-              FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor: _primaryColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text(
-                  '下载',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-        );
-
-        if (confirmed == true && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('正在下载更新...'),
-              backgroundColor: _surfaceVariant,
-            ),
-          );
-          final success = await service.downloadUpdate();
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  success ? '更新已就绪，重启应用后生效' : '下载失败，请稍后重试',
-                  style: const TextStyle(),
-                ),
-                backgroundColor: _surfaceVariant,
-              ),
-            );
-          }
-        }
-        break;
-      case UpdateStatus.upToDate:
-        final patchNum = await service.currentPatchVersion;
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                '已是最新版本 (补丁 #${patchNum ?? 0})',
-                style: const TextStyle(),
-              ),
-              backgroundColor: _surfaceVariant,
-            ),
-          );
-        }
-        break;
-      case UpdateStatus.error:
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              '检查更新失败，请检查网络连接',
-              style: TextStyle(),
-            ),
-            backgroundColor: _surfaceVariant,
-          ),
-        );
-        break;
-      default:
-        break;
-    }
-  }
-
   void _deleteAllRecords() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: _surfaceColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           side: const BorderSide(color: _borderColor),
         ),
         title: const Text(
@@ -617,7 +482,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder: (context) => AlertDialog(
         backgroundColor: _surfaceColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           side: const BorderSide(color: _borderColor),
         ),
         title: const Text(
@@ -668,7 +533,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder: (context) => AlertDialog(
         backgroundColor: _surfaceColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           side: const BorderSide(color: _borderColor),
         ),
         title: const Text(
@@ -699,7 +564,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: _surfaceVariant,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: _borderColor),
                   ),
                   child: SingleChildScrollView(
@@ -737,7 +602,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder: (context) => AlertDialog(
         backgroundColor: _surfaceColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           side: const BorderSide(color: _borderColor),
         ),
         title: const Text(
@@ -767,7 +632,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: _surfaceVariant,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: _borderColor),
                   ),
                   child: TextField(

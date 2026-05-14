@@ -140,7 +140,7 @@ class _WorkoutTemplatesScreenState extends State<WorkoutTemplatesScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
         onTap: () => _useTemplate(template),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -342,7 +342,7 @@ class _CreateTemplateBottomSheetState
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16),
             ),
             child: TextField(
               controller: _nameController,
@@ -370,14 +370,14 @@ class _CreateTemplateBottomSheetState
                     color: isSelected
                         ? theme.colorScheme.primary
                         : theme.colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(16),
                     child: InkWell(
                       onTap: () {
                         setState(() {
                           _selectedBodyPart = isSelected ? null : tag;
                         });
                       },
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(16),
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         child: Text(
@@ -423,7 +423,7 @@ class _CreateTemplateBottomSheetState
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Center(
                       child: Text(
@@ -437,7 +437,7 @@ class _CreateTemplateBottomSheetState
                 : Container(
                     decoration: BoxDecoration(
                       color: theme.colorScheme.surfaceContainerHighest.withAlpha(76),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: ListView.builder(
                       controller: widget.scrollController,
@@ -494,7 +494,7 @@ class _CreateTemplateBottomSheetState
                           horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: theme.colorScheme.primary.withAlpha(76),
                         ),
@@ -555,7 +555,7 @@ class _CreateTemplateBottomSheetState
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(16),
                 ),
               ),
               child: const Text(
@@ -665,7 +665,7 @@ class _CreateTemplateBottomSheetState
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                       child: const Text('取消'),
@@ -693,7 +693,7 @@ class _CreateTemplateBottomSheetState
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                       child: const Text('确定'),
@@ -729,7 +729,7 @@ class _CreateTemplateBottomSheetState
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
             color: theme.colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
             children: [
@@ -851,7 +851,7 @@ class _CreateTemplateBottomSheetState
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                       child: const Text('取消'),
@@ -879,7 +879,7 @@ class _CreateTemplateBottomSheetState
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                       child: const Text('保存'),

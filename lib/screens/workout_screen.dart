@@ -743,7 +743,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withAlpha(51),
@@ -764,7 +764,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
             ),
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
             child: Material(
               color: Colors.transparent,
               child: InkWell(

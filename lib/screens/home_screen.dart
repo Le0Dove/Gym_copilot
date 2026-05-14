@@ -172,43 +172,38 @@ class HomeScreenState extends State<HomeScreen>
               ),
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400),
+          constraints: const BoxConstraints(maxWidth: 500),
           child: Row(
             children: [
               Expanded(
                 flex: 2,
                 child: FilledButton.icon(
                   onPressed: () async {
-                    final result = await Navigator.push(
+                    await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => const WorkoutScreen(),
                       ),
                     );
-                    debugPrint('WorkoutScreen 返回结果: $result');
-                    // 延迟确保数据库操作完成
                     await Future.delayed(const Duration(milliseconds: 500));
                     loadData();
                   },
-                  icon: const Icon(Icons.add, size: 20),
-                  label: const Text(
-                    '开始训练',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                  ),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('开始训练'),
                   style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                     backgroundColor: const Color(0xFFE8E4E1),
                     foregroundColor: const Color(0xFF0A0A0A),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 0,
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () async {
@@ -220,14 +215,14 @@ class HomeScreenState extends State<HomeScreen>
                     );
                     loadData();
                   },
-                  icon: const Icon(Icons.folder_outlined, size: 18),
+                  icon: const Icon(Icons.folder_outlined, size: 16),
                   label: const Text('模板'),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                     foregroundColor: const Color(0xFF8B8680),
-                    side: const BorderSide(color: Color(0xFF2A2A2A)),
+                    side: const BorderSide(color: Color(0xFF2A3248)),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                 ),
@@ -244,7 +239,7 @@ class HomeScreenState extends State<HomeScreen>
     return FadeInDown(
       duration: const Duration(milliseconds: 500),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
         child: GestureDetector(
           onTap: () {
             Navigator.push(
@@ -255,7 +250,7 @@ class HomeScreenState extends State<HomeScreen>
             );
           },
           child: Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: _currentStreak > 0
@@ -270,7 +265,7 @@ class HomeScreenState extends State<HomeScreen>
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: _currentStreak > 0
                     ? const Color(0xFFFF6B35).withAlpha(76)
@@ -281,8 +276,8 @@ class HomeScreenState extends State<HomeScreen>
             child: Row(
               children: [
                 Container(
-                  width: 52,
-                  height: 52,
+                  width: 48,
+                  height: 48,
                   decoration: BoxDecoration(
                     gradient: _currentStreak > 0
                         ? const LinearGradient(
@@ -292,28 +287,28 @@ class HomeScreenState extends State<HomeScreen>
                           )
                         : LinearGradient(
                             colors: [
-                              theme.colorScheme.onSurfaceVariant.withAlpha(51),
-                              theme.colorScheme.onSurfaceVariant.withAlpha(25),
+                              theme.colorScheme.onSurfaceVariant.withAlpha(38),
+                              theme.colorScheme.onSurfaceVariant.withAlpha(15),
                             ],
                           ),
                     shape: BoxShape.circle,
                     boxShadow: _currentStreak > 0
                         ? [
                             BoxShadow(
-                              color: const Color(0xFFFF6B35).withAlpha(76),
-                              blurRadius: 12,
-                              spreadRadius: 2,
+                              color: const Color(0xFFFF6B35).withAlpha(51),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
                             ),
                           ]
                         : null,
                   ),
                   child: Icon(
                     _currentStreak > 0 ? Icons.local_fire_department : Icons.local_fire_department_outlined,
-                    size: 28,
+                    size: 24,
                     color: _currentStreak > 0 ? Colors.white : theme.colorScheme.onSurfaceVariant.withAlpha(127),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -325,47 +320,38 @@ class HomeScreenState extends State<HomeScreen>
                                 ? '已休息 $_daysSinceLastWorkout 天'
                                 : '开始你的训练之旅',
                         style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           color: _currentStreak > 0
                               ? const Color(0xFFFF8C42)
                               : theme.colorScheme.onSurface,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
                         _currentStreak > 0
-                            ? '最长纪录: $_longestStreak 天 🔥'
+                            ? '最长纪录: $_longestStreak 天'
                             : _daysSinceLastWorkout > 1
-                                ? '你的 $_longestStreak 天纪录中断了，今天重新开始！'
+                                ? '$_longestStreak 天纪录中断了，今天重新开始！'
                                 : '坚持训练，建立你的连续纪录',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
+                        style: theme.textTheme.bodySmall,
                       ),
                     ],
                   ),
                 ),
                 if (_currentStreak > 0)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [Color(0xFFFF6B35), Color(0xFFFF8C42)],
                       ),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFFF6B35).withAlpha(76),
-                          blurRadius: 8,
-                          spreadRadius: 0,
-                        ),
-                      ],
+                      borderRadius: BorderRadius.circular(14),
                     ),
                     child: Text(
                       '$_currentStreak',
                       style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
                         color: Colors.white,
                       ),
                     ),
@@ -380,7 +366,7 @@ class HomeScreenState extends State<HomeScreen>
 
   Widget _buildHeader(ThemeData theme) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -391,38 +377,19 @@ class HomeScreenState extends State<HomeScreen>
               style: theme.textTheme.titleSmall,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 14),
           FadeInUp(
             duration: const Duration(milliseconds: 600),
             delay: const Duration(milliseconds: 100),
             child: Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    theme.colorScheme.surface,
-                    theme.colorScheme.surface.withAlpha(204),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(24),
+                color: theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: theme.colorScheme.outline.withAlpha(127),
+                  color: theme.colorScheme.outline.withAlpha(51),
                   width: 1,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(51),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                  BoxShadow(
-                    color: theme.colorScheme.primary.withAlpha(12),
-                    blurRadius: 40,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
               ),
               child: Row(
                 children: [
@@ -436,24 +403,14 @@ class HomeScreenState extends State<HomeScreen>
                   ),
                   Container(
                     width: 1,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.transparent,
-                          theme.colorScheme.outline.withAlpha(127),
-                          Colors.transparent,
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                    ),
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    height: 52,
+                    color: theme.colorScheme.outline.withAlpha(38),
+                    margin: const EdgeInsets.symmetric(horizontal: 12),
                   ),
                   Expanded(
                     child: _buildStatBlock(
                       '$_weeklyDuration',
-                      '总时长(分钟)',
+                      '总时长(分)',
                       Icons.schedule_outlined,
                       theme,
                     ),
@@ -472,33 +429,29 @@ class HomeScreenState extends State<HomeScreen>
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: theme.colorScheme.primary.withAlpha(25),
+            color: theme.colorScheme.primary.withAlpha(20),
             shape: BoxShape.circle,
           ),
           child: Icon(
             icon,
-            size: 20,
+            size: 18,
             color: theme.colorScheme.primary,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         Text(
           value,
-          style: theme.textTheme.displayMedium?.copyWith(
-            fontSize: 36,
+          style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.w700,
-            height: 1.1,
             color: theme.colorScheme.onSurface,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2),
         Text(
           label,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
+          style: theme.textTheme.bodySmall,
         ),
       ],
     );
@@ -506,10 +459,10 @@ class HomeScreenState extends State<HomeScreen>
 
   Widget _buildSectionTitle(String title, ThemeData theme) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 32, 20, 12),
+      padding: const EdgeInsets.fromLTRB(16, 28, 16, 8),
       child: Text(
         title,
-        style: theme.textTheme.titleLarge?.copyWith(
+        style: theme.textTheme.headlineSmall?.copyWith(
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -588,38 +541,6 @@ class HomeScreenState extends State<HomeScreen>
                   shadowColor: theme.colorScheme.primary.withAlpha(102),
                 ),
               ),
-              const SizedBox(height: 16),
-              // 调试按钮：插入测试数据
-              OutlinedButton.icon(
-                onPressed: () async {
-                  try {
-                    await DatabaseHelper.instance.insertTestData();
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('测试数据已插入')),
-                      );
-                      loadData();
-                    }
-                  } catch (e) {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('插入失败: $e')),
-                      );
-                    }
-                  }
-                },
-                icon: const Icon(Icons.bug_report, size: 16),
-                label: const Text('插入测试数据（调试用）'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: theme.colorScheme.onSurfaceVariant,
-                  side: BorderSide(
-                    color: theme.colorScheme.outline.withAlpha(127),
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
             ],
           ),
         ),
@@ -631,147 +552,116 @@ class HomeScreenState extends State<HomeScreen>
     final tagColor = _getTagColor(record.bodyPart);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Card(
         child: InkWell(
           onTap: () => _showRecordDetail(record, theme),
-          borderRadius: BorderRadius.circular(20),
-          splashColor: tagColor.withAlpha(25),
-          highlightColor: tagColor.withAlpha(12),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              gradient: LinearGradient(
-                colors: [
-                  theme.colorScheme.surface,
-                  theme.colorScheme.surface.withAlpha(242),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 10,
-                            height: 10,
-                            decoration: BoxDecoration(
-                              color: tagColor.withAlpha(76),
-                              shape: BoxShape.circle,
-                              border: Border.all(color: tagColor, width: 2.5),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: tagColor.withAlpha(76),
-                                  blurRadius: 6,
-                                  spreadRadius: 0,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            ExerciseData.getTagDisplayName(record.bodyPart),
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceContainerHighest.withAlpha(153),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          DateFormat('MM/dd HH:mm').format(record.dateTime),
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            fontSize: 11,
+          borderRadius: BorderRadius.circular(16),
+          splashColor: tagColor.withAlpha(20),
+          highlightColor: tagColor.withAlpha(10),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: tagColor,
+                            shape: BoxShape.circle,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      _buildInfoChip(
-                        '${record.durationMinutes}分钟',
-                        theme,
-                        Icons.timer_outlined,
-                      ),
-                      const SizedBox(width: 8),
-                      _buildInfoChip(
-                        '${record.exerciseSets.length}组',
-                        theme,
-                        Icons.format_list_numbered_outlined,
-                      ),
-                      const SizedBox(width: 8),
-                      _buildInfoChip(
-                        '疲劳${record.fatigueLevel}',
-                        theme,
-                        Icons.battery_alert_outlined,
-                      ),
-                    ],
-                  ),
-                  if (record.exerciseSets.isNotEmpty) ...[
-                    const SizedBox(height: 14),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest.withAlpha(102),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Wrap(
-                        spacing: 8,
-                        runSpacing: 6,
-                        children: [
-                          ...record.exerciseSets.take(4).map((set) {
-                            return Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.surface.withAlpha(153),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                '${set.exerciseName} ${set.weight}kg×${set.reps}',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            );
-                          }),
-                          if (record.exerciseSets.length > 4)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.primary.withAlpha(38),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                '+${record.exerciseSets.length - 4}',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.primary,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
+                        const SizedBox(width: 8),
+                        Text(
+                          ExerciseData.getTagDisplayName(record.bodyPart),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      DateFormat('MM/dd HH:mm').format(record.dateTime),
+                      style: theme.textTheme.bodySmall,
                     ),
                   ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    _buildInfoChip(
+                      '${record.durationMinutes}分钟',
+                      theme,
+                      Icons.timer_outlined,
+                    ),
+                    const SizedBox(width: 6),
+                    _buildInfoChip(
+                      '${record.exerciseSets.length}组',
+                      theme,
+                      Icons.format_list_numbered_outlined,
+                    ),
+                    const SizedBox(width: 6),
+                    _buildInfoChip(
+                      '疲劳${record.fatigueLevel}',
+                      theme,
+                      Icons.battery_alert_outlined,
+                    ),
+                  ],
+                ),
+                if (record.exerciseSets.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest.withAlpha(76),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Wrap(
+                      spacing: 6,
+                      runSpacing: 4,
+                      children: [
+                        ...record.exerciseSets.take(4).map((set) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surface,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              '${set.exerciseName} ${set.weight}kg×${set.reps}',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                fontSize: 11,
+                              ),
+                            ),
+                          );
+                        }),
+                        if (record.exerciseSets.length > 4)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withAlpha(30),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              '+${record.exerciseSets.length - 4}',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ],
-              ),
+              ],
             ),
           ),
         ),
@@ -781,21 +671,10 @@ class HomeScreenState extends State<HomeScreen>
 
   Widget _buildInfoChip(String text, ThemeData theme, IconData icon) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            theme.colorScheme.surfaceContainerHighest.withAlpha(178),
-            theme.colorScheme.surfaceContainerHighest.withAlpha(102),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: theme.colorScheme.surfaceContainerHighest.withAlpha(127),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: theme.colorScheme.outline.withAlpha(76),
-          width: 1,
-        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

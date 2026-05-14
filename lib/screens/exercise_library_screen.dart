@@ -121,7 +121,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
               child: Container(
                 decoration: BoxDecoration(
                   color: _surfaceVariant,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: _border,
                     width: 1,
@@ -211,7 +211,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                             elevation: 0,
                             color: _surface,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(16),
                               side: const BorderSide(
                                 color: _border,
                                 width: 1,
@@ -220,7 +220,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                             child: InkWell(
                               onTap: () => _showExerciseDetail(
                                   exercise, useCount, lastUsedDate),
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(16),
                               child: Padding(
                                 padding: const EdgeInsets.all(16),
                                 child: Row(
@@ -233,7 +233,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                         color: _getTagColor(exercise.tag)
                                             .withAlpha(38),
                                         borderRadius:
-                                            BorderRadius.circular(20),
+                                            BorderRadius.circular(16),
                                       ),
                                       child: Center(
                                         child: Icon(
@@ -361,7 +361,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           foregroundColor: _foreground,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: const Icon(Icons.add, size: 20),
         ),
@@ -394,7 +394,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected ? _primary : _surfaceVariant,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? _primary : _border,
             width: 1.5,
@@ -482,7 +482,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                       height: 48,
                       decoration: BoxDecoration(
                         color: _getTagColor(exercise.tag).withAlpha(38),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                       child: Center(
                         child: Icon(
@@ -567,7 +567,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                       backgroundColor: _primary,
                       foregroundColor: _foreground,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                   ),
@@ -596,7 +596,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(color: _error.withAlpha(76)),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                     ),
@@ -666,7 +666,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
         return AlertDialog(
           backgroundColor: _surface,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
           ),
           title: const Text(
             '确认删除',
@@ -697,7 +697,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                 backgroundColor: _error,
                 foregroundColor: _foreground,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(16),
                 ),
               ),
               child: const Text(
@@ -725,7 +725,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
         builder: (context, setState) => AlertDialog(
           backgroundColor: _surface,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
           ),
           title: const Text(
             '添加自定义动作',
@@ -831,7 +831,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                 backgroundColor: _primary,
                 foregroundColor: _foreground,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(16),
                 ),
               ),
               child: const Text(
